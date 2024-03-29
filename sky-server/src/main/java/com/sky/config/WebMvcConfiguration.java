@@ -2,10 +2,13 @@ package com.sky.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.sky.interceptor.JwtTokenAdminInterceptor;
+import com.sky.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -15,6 +18,8 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+
+import java.util.List;
 
 /**
  * 配置类，注册web层相关组件
@@ -57,6 +62,25 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .paths(PathSelectors.any())
                 .build();
         return docket;
+    }
+
+    /**
+     * 扩展mvc框架的消息转换器
+     * @param converters
+     */
+    @Override
+    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        log.info("开始扩展mvc框架的消息转换器");
+
+        //创建消息转换器对象
+        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+
+        //设置对象转换器，使用Jackson将Java对象装换成json
+        messageConverter.setObjectMapper(new JacksonObjectMapper());
+
+        //将消息转换器添加到mvc框架的转换器集合中，设置index为0 优先使用
+        converters.add(0, messageConverter);
+
     }
 
     /**

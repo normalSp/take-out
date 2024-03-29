@@ -1,14 +1,18 @@
 package com.sky.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -16,11 +20,10 @@ import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -103,5 +106,24 @@ public class EmployeeController {
 
 
         return Result.success("新增成功");
+    }
+
+    @GetMapping("/page")
+    @ApiOperation("分页查询员工")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
+        log.info("分页查询员工：{}", employeePageQueryDTO);
+
+        Page page = new Page(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        lambdaQueryWrapper.like(StringUtils.isNotBlank(employeePageQueryDTO.getName()),
+                Employee::getName, employeePageQueryDTO.getName());
+
+        lambdaQueryWrapper.orderByDesc(Employee::getUpdateTime);
+
+        employeeService.page(page, lambdaQueryWrapper);
+
+        return Result.success(new PageResult(page.getTotal(), page.getRecords()));
     }
 }
