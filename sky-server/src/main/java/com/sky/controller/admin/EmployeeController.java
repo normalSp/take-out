@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 员工管理
@@ -50,6 +52,8 @@ public class EmployeeController {
     @PostMapping("/login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
+
+
 
         Employee employee = employeeService.login(employeeLoginDTO);
 
@@ -126,4 +130,35 @@ public class EmployeeController {
 
         return Result.success(new PageResult(page.getTotal(), page.getRecords()));
     }
+
+    /**
+     * 禁用账号
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("禁用账号")
+    public Result<String> forbidOrEnable(@PathVariable Integer status,Long id){
+        log.info("账号状态：{}", status);
+        log.info("账号id：{}", id);
+
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Employee::getId, id);
+
+        Employee employee = employeeService.getOne(lambdaQueryWrapper);
+
+        if(null != employee){
+            if(Objects.equals(status, StatusConstant.ENABLE)){
+                employee.setStatus(StatusConstant.ENABLE);
+                employeeService.updateById(employee);
+                return Result.success(MessageConstant.ACTIVATED_SUCCEED);
+            }
+            employee.setStatus(StatusConstant.DISABLE);
+            employeeService.updateById(employee);
+            return Result.success(MessageConstant.LOCKED_SUCCEED);
+        }
+
+        return Result.error(MessageConstant.ACCOUNT_NOT_FOUND);
+    }
+
 }
