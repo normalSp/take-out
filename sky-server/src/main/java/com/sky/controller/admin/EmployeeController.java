@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.StringUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -161,4 +162,40 @@ public class EmployeeController {
         return Result.error(MessageConstant.ACCOUNT_NOT_FOUND);
     }
 
+    /**
+     * 根据id查询员工信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询员工信息")
+    public Result<Employee> getEmployeeById(@PathVariable Long id) {
+        log.info("根据id查询员工信息：{}", id);
+
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Employee::getId, id);
+        Employee employee = employeeService.getOne(lambdaQueryWrapper);
+
+        return Result.success(employee);
+    }
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("修改员工信息")
+    public Result<String> update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("修改员工信息：{}", employeeDTO);
+
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        if(null != employee.getId()){
+            employeeService.updateById(employee);
+            return Result.success(MessageConstant.ACCOUNT_EDIT_SUCCEED);
+        }
+        return Result.error(MessageConstant.ACCOUNT_NOT_FOUND);
+    }
 }

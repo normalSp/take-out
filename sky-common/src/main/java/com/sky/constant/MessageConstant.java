@@ -10,6 +10,7 @@ public class MessageConstant {
     public static final String ACCOUNT_LOCKED = "账号被锁定";
     public static final String LOCKED_SUCCEED = "账号锁定成功";
     public static final String ACTIVATED_SUCCEED = "账号启用成功";
+    public static final String ACCOUNT_EDIT_SUCCEED = "账号修改成功";
     public static final String ALREADY_EXIST = "已存在";
     public static final String UNKNOWN_ERROR = "未知错误";
     public static final String USER_NOT_LOGIN = "用户未登录";
