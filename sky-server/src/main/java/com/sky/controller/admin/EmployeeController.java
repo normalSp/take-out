@@ -1,8 +1,10 @@
 package com.sky.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
@@ -95,8 +97,6 @@ public class EmployeeController {
                 .idNumber(employeeDTO.getIdNumber())
                 .password(DigestUtils.md5Hex(PasswordConstant.DEFAULT_PASSWORD))
                 .status(StatusConstant.ENABLE)
-                .createUser(10L)
-                .updateUser(10L)
                 .build();
 
         employeeService.save(employee);
