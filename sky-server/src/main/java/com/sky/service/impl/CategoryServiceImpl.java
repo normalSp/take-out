@@ -66,6 +66,14 @@ public class CategoryServiceImpl implements CategoryService {
     public PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
         PageHelper.startPage(categoryPageQueryDTO.getPage(),categoryPageQueryDTO.getPageSize());
         //下一条sql进行分页，自动加入limit关键字分页
+        if(null == categoryPageQueryDTO.getName()){
+            categoryPageQueryDTO.setName("%");
+        }
+        if(null == categoryPageQueryDTO.getType()){
+            Page<Category> page = categoryMapper.pageQuery1(categoryPageQueryDTO);
+            log.info("分页查询分类数据：{}",page);
+            return new PageResult(page.getTotal(), page.getResult());
+        }
         Page<Category> page = categoryMapper.pageQuery(categoryPageQueryDTO);
         log.info("分页查询分类数据：{}",page);
         return new PageResult(page.getTotal(), page.getResult());

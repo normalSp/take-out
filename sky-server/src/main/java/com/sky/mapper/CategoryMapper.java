@@ -27,8 +27,16 @@ public interface CategoryMapper{
      * @param categoryPageQueryDTO
      * @return
      */
-    @Select("SELECT * FROM category WHERE((name IS NOT NULL AND name != '') and name like concat('%',#{name},'%')) AND (type IS NULL OR type = #{type}) ORDER BY sort ASC, create_time DESC")
+    @Select(" SELECT * FROM category WHERE ((name like concat('%',#{name},'%')) AND (type LIKE concat('%',#{type}))) ")
     Page<Category> pageQuery(CategoryPageQueryDTO categoryPageQueryDTO);
+
+    /**
+     * 分页查询1
+     * @param categoryPageQueryDTO
+     * @return
+     */
+    @Select(" SELECT * FROM category WHERE ((name like concat('%',#{name},'%')) AND (type LIKE concat('%'))) ")
+    Page<Category> pageQuery1(CategoryPageQueryDTO categoryPageQueryDTO);
 
     /**
      * 根据id删除分类
