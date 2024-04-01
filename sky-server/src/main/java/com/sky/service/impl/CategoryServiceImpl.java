@@ -16,6 +16,7 @@ import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.CategoryService;
+import com.sky.utils.AliOssUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ public class CategoryServiceImpl implements CategoryService {
     private DishMapper dishMapper;
     @Autowired
     private SetmealMapper setmealMapper;
-
+    @Autowired
+    private AliOssUtil aliOssUtil;
     /**
      * 新增分类
      * @param categoryDTO
@@ -129,11 +131,16 @@ public class CategoryServiceImpl implements CategoryService {
      * @param id
      */
     public void startOrStop(Integer status, Long id) {
+        Category oldCategory = categoryMapper.selectById(id);
+
         Category category = Category.builder()
                 .id(id)
                 .status(status)
                 .updateTime(LocalDateTime.now())
                 .updateUser(BaseContext.getCurrentId())
+                .type(oldCategory.getType())
+                .name(oldCategory.getName())
+                .sort(oldCategory.getSort())
                 .build();
         categoryMapper.update(category);
     }
