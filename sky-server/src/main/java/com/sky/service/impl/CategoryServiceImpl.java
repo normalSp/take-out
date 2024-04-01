@@ -114,6 +114,10 @@ public class CategoryServiceImpl implements CategoryService {
         category.setUpdateTime(LocalDateTime.now());
         category.setUpdateUser(BaseContext.getCurrentId());
 
+        Category oldCategory = categoryMapper.selectById(category.getId());
+        category.setType(oldCategory.getType());
+        category.setStatus(oldCategory.getStatus());
+
         log.info("修改分类数据：{}",category);
 
         categoryMapper.update(category);

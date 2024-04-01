@@ -71,4 +71,13 @@ public interface CategoryMapper{
             "  AND (type IS NULL OR type = #{type})\n" +
             "ORDER BY sort ASC, create_time DESC")
     List<Category> list(Integer type);
+
+    /**
+     * 根据id查询分类
+     * @param id
+     * @return
+     */
+    @Select("Select * from category where id = #{id}")
+    Category selectById(Long id);
+
 }
