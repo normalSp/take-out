@@ -11,7 +11,9 @@ public class AliOssProperties {
 
     private String endpoint;
     private String accessKeyId;
+    private String accessKeyId1;
     private String accessKeySecret;
+    private String accessKeySecret1;
     private String bucketName;
 
 }

@@ -1,10 +1,12 @@
 package com.sky.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.sky.entity.Setmeal;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 @Mapper
-public interface SetmealMapper {
+public interface SetmealMapper extends BaseMapper<Setmeal> {
 
     /**
      * 根据分类id查询套餐的数量
