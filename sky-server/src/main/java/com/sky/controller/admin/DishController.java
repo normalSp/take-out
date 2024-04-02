@@ -141,7 +141,27 @@ public class DishController {
         }
 
         return Result.success(MessageConstant.DELETE_SUCCESS);
+    }
+    
+    @PostMapping("/status/{status}")
+    @ApiOperation("菜品启售或禁售")
+    public Result<String> forbidOrEnable(@PathVariable Integer status, Long id){
+        log.info("调用菜品启售或禁售方法，传入的菜品id --> id:{}, 状态 --> status:{}", id, status);
 
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Dish::getId, id);
+
+        Dish dish = dishService.getOne(lambdaQueryWrapper);
+
+        if(null == dish){
+            return Result.error(MessageConstant.DISH_NOT_EXIST);
+        }
+
+        dish.setStatus(status);
+
+        dishService.updateById(dish);
+
+        return Result.success(MessageConstant.UPDATE_SUCCESS);
 
     }
 }
