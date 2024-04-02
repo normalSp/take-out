@@ -164,4 +164,28 @@ public class DishController {
         return Result.success(MessageConstant.UPDATE_SUCCESS);
 
     }
+
+    @GetMapping("/{id}")
+    @Transactional
+    @ApiOperation("根据id查询菜品和口味信息")
+    public Result<DishVO> getById(@PathVariable Long id){
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper =  new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Dish::getId, id);
+
+        Dish dish = dishService.getOne(lambdaQueryWrapper);
+
+        LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, id);
+
+        List<DishFlavor> dishFlavorList = dishFlavorService.list(dishFlavorLambdaQueryWrapper);
+
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(dishFlavorList);
+
+        return Result.success(dishVO);
+    }
+
+
+
 }
