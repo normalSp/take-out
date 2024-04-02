@@ -10,6 +10,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class CategoryController {
      */
     @PostMapping
     @ApiOperation("新增分类")
+    @CacheEvict(value = "category", allEntries = true)
     public Result<String> save(@RequestBody CategoryDTO categoryDTO){
         log.info("新增分类：{}", categoryDTO);
         categoryService.save(categoryDTO);
@@ -45,6 +48,7 @@ public class CategoryController {
      */
     @GetMapping("/page")
     @ApiOperation("分类分页查询")
+    @Cacheable(value = "category")
     public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO){
         log.info("分页查询：{}", categoryPageQueryDTO);
         PageResult pageResult = categoryService.pageQuery(categoryPageQueryDTO);
@@ -58,6 +62,7 @@ public class CategoryController {
      */
     @DeleteMapping
     @ApiOperation("删除分类")
+    @CacheEvict(value = "category", allEntries = true)
     public Result<String> deleteById(Long id){
         log.info("删除分类：{}", id);
         categoryService.deleteById(id);
@@ -71,6 +76,7 @@ public class CategoryController {
      */
     @PutMapping
     @ApiOperation("修改分类")
+    @CacheEvict(value = "category", allEntries = true)
     public Result<String> update(@RequestBody CategoryDTO categoryDTO){
         categoryService.update(categoryDTO);
         return Result.success();
@@ -84,6 +90,7 @@ public class CategoryController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation("启用禁用分类")
+    @CacheEvict(value = "category", allEntries = true)
     public Result<String> startOrStop(@PathVariable("status") Integer status, Long id){
         categoryService.startOrStop(status,id);
         return Result.success();

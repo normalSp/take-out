@@ -17,7 +17,6 @@ import com.sky.service.CategoryService;
 import com.sky.service.DishFlavorService;
 import com.sky.service.DishService;
 import com.sky.service.SetmealDishService;
-import com.sky.service.impl.DishServiceImpl;
 import com.sky.utils.AliOssUtil;
 import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
@@ -26,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +40,6 @@ import java.util.List;
 @Api("菜品相关接口")
 @Slf4j
 public class DishController {
-
-    @Autowired
-    private AliOssUtil aliOssUtil;
     @Autowired
     private DishService dishService;
     @Autowired
@@ -53,6 +52,7 @@ public class DishController {
     @PostMapping()
     @ApiOperation("菜品保存")
     @Transactional
+    @CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' + #dishDTO.status")
     public Result<String> save(@RequestBody  DishDTO dishDTO){
         log.info("菜品保存信息：{}", dishDTO);
 
@@ -65,6 +65,7 @@ public class DishController {
     @GetMapping("/page")
     @ApiOperation("分页查询菜品")
     @Transactional
+    @Cacheable(value = "dish", key = "#dishPageQueryDTO.categoryId + '_' + #dishPageQueryDTO.status")
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
         log.info("分页查询菜品：{}", dishPageQueryDTO);
 
@@ -115,6 +116,7 @@ public class DishController {
     @DeleteMapping()
     @Transactional
     @ApiOperation("删除菜品")
+    @CacheEvict(value = "dish", allEntries = true)
     public Result<String> deletes(Long[] ids){
         log.info("调用删除菜品方法，传入的菜品id --> ids:{}", ids);
 
@@ -145,6 +147,7 @@ public class DishController {
     
     @PostMapping("/status/{status}")
     @ApiOperation("菜品启售或禁售")
+    @CacheEvict(value = "dish", allEntries = true)
     public Result<String> forbidOrEnable(@PathVariable Integer status, Long id){
         log.info("调用菜品启售或禁售方法，传入的菜品id --> id:{}, 状态 --> status:{}", id, status);
 
@@ -189,6 +192,7 @@ public class DishController {
     @PutMapping()
     @ApiOperation("修改菜品")
     @Transactional
+    @CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' + #dishDTO.status")
     public Result<String> update(@RequestBody DishDTO dishDTO){
         List<DishFlavor> dishFlavorList = dishDTO.getFlavors();
 

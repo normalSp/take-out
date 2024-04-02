@@ -5,6 +5,20 @@ spring:
     active: dev
   main:
     allow-circular-references: true
+  redis:
+    host: ${spring.redis.host}
+    port: ${spring.redis.port}
+    password: ${spring.redis.password}
+    database: ${spring.redis.database}
+    jedis:
+      pool:
+        max-active: ${spring.redis.jedis.pool.max-active}
+        max-wait: ${spring.redis.jedis.pool.max-wait}
+        max-idle: ${spring.redis.jedis.pool.max-idle}
+        min-idle: ${spring.redis.jedis.pool.min-idle}
+  cache:
+    redis:
+      time-to-live: ${spring.cache.redis.time-to-live}
   datasource:
     druid:
       driver-class-name: ${sky.datasource.driver-class-name}
