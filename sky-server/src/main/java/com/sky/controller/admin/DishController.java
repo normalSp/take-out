@@ -3,16 +3,20 @@ package com.sky.controller.admin;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Category;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.SetmealDish;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
 import com.sky.service.DishFlavorService;
 import com.sky.service.DishService;
+import com.sky.service.SetmealDishService;
 import com.sky.service.impl.DishServiceImpl;
 import com.sky.utils.AliOssUtil;
 import com.sky.vo.DishVO;
@@ -26,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -40,6 +45,10 @@ public class DishController {
     private DishService dishService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private SetmealDishService setmealDishService;
+    @Autowired
+    private DishFlavorService dishFlavorService;
 
     @PostMapping()
     @ApiOperation("菜品保存")
@@ -100,5 +109,39 @@ public class DishController {
         PageResult pageResult = new PageResult(page.getTotal(), dishVOList);
 
         return Result.success(pageResult);
+    }
+
+
+    @DeleteMapping()
+    @Transactional
+    @ApiOperation("删除菜品")
+    public Result<String> deletes(Long[] ids){
+        log.info("调用删除菜品方法，传入的菜品id --> ids:{}", ids);
+
+        LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(SetmealDish::getDishId, Arrays.asList(ids));
+
+        SetmealDish setmealDish = setmealDishService.getOne(lambdaQueryWrapper);
+
+        if(null != setmealDish){
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+
+        for (Long id : ids) {
+            Dish dish = dishService.getById(id);
+            if(StatusConstant.DISABLE.equals(dish.getStatus())){
+                dishService.removeById(id);
+                LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper1 = new LambdaQueryWrapper<>();
+                lambdaQueryWrapper1.eq(DishFlavor::getDishId, id);
+                dishFlavorService.remove(lambdaQueryWrapper1);
+            }
+            else{
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+        return Result.success(MessageConstant.DELETE_SUCCESS);
+
+
     }
 }
