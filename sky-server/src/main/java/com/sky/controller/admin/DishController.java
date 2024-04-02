@@ -186,6 +186,30 @@ public class DishController {
         return Result.success(dishVO);
     }
 
+    @PutMapping()
+    @ApiOperation("修改菜品")
+    @Transactional
+    public Result<String> update(@RequestBody DishDTO dishDTO){
+        List<DishFlavor> dishFlavorList = dishDTO.getFlavors();
+
+        for(DishFlavor dishFlavor : dishFlavorList){
+            dishFlavor.setDishId(dishDTO.getId());
+        }
+
+        Dish dish = new Dish();
+
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishService.updateById(dish);
+
+        LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(DishFlavor::getDishId, dish.getId());
+
+        dishFlavorService.remove(lambdaQueryWrapper);
+
+        dishFlavorService.saveBatch(dishFlavorList);
+
+        return Result.success(MessageConstant.UPDATE_SUCCESS);
+    }
 
 
 }
