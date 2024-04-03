@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -152,4 +153,39 @@ public class SetmealController {
 
         return Result.success(MessageConstant.UPDATE_SUCCESS);
     }
+
+    @DeleteMapping()
+    @Transactional
+    @CacheEvict(value = "setmeal",allEntries = true)
+    @ApiOperation("删除套餐")
+    public Result<String> deletes(Long[] ids){
+        setmealService.removeByIds(Arrays.asList(ids));
+
+        LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
+
+        setmealDishService.remove(lambdaQueryWrapper);
+
+        return Result.success(MessageConstant.DELETE_SUCCESS);
+
+    }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用或禁用套餐")
+    @CacheEvict(value = "setmeal",allEntries = true)
+    public Result<String> forbidOrEnable(@PathVariable Integer status, Long id){
+        LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Setmeal::getId,id);
+
+        Setmeal setmeal = setmealService.getOne(lambdaQueryWrapper);
+
+        if(null != setmeal){
+            setmeal.setStatus(status);
+            setmealService.updateById(setmeal);
+            return Result.success(MessageConstant.UPDATE_SUCCESS);
+        }
+
+        return Result.error(MessageConstant.SETMEAL_NOT_EXIST);
+    }
+
 }
