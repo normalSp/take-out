@@ -52,7 +52,7 @@ public class DishController {
     @PostMapping()
     @ApiOperation("菜品保存")
     @Transactional
-    @CacheEvict(value = "dish", key = "#dishDTO.categoryId")
+    @CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' +#dishDTO.status")
     public Result<String> save(@RequestBody  DishDTO dishDTO){
         log.info("菜品保存信息：{}", dishDTO);
 
@@ -65,7 +65,7 @@ public class DishController {
     @GetMapping("/page")
     @ApiOperation("分页查询菜品")
     @Transactional
-    @Cacheable(value = "dish", key = "#dishPageQueryDTO.categoryId")
+    @Cacheable(value = "dish", key = "#dishPageQueryDTO.categoryId + '_' +#dishPageQueryDTO.status")
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
         log.info("分页查询菜品：{}", dishPageQueryDTO);
 
@@ -192,7 +192,7 @@ public class DishController {
     @PutMapping()
     @ApiOperation("修改菜品")
     @Transactional
-    @CacheEvict(value = "dish", key = "#dishDTO.categoryId")
+    @CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' +#dishDTO.status")
     public Result<String> update(@RequestBody DishDTO dishDTO){
         List<DishFlavor> dishFlavorList = dishDTO.getFlavors();
 
@@ -218,7 +218,7 @@ public class DishController {
 
     @GetMapping ("/list")
     @ApiOperation("根据分类id查询菜品")
-    @CacheEvict(value = "dish", key = "#dishDTO.categoryId")
+    @CacheEvict(value = "dish", key = "#categoryId + '_' + 1")
     public Result<List<Dish>> getByCategoryId(Long categoryId){
         LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Dish::getCategoryId, categoryId);

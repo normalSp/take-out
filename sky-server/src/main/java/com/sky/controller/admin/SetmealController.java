@@ -99,5 +99,57 @@ public class SetmealController {
         return Result.success(MessageConstant.SAVE_SUCCESS);
     }
     
-    
+
+    @GetMapping("/{id}")
+    @Transactional
+    @ApiOperation("根据id查询套餐")
+    public Result<SetmealVO> getById(@PathVariable Long id){
+        LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Setmeal::getId,id);
+
+        Setmeal setmeal = setmealService.getOne(lambdaQueryWrapper);
+
+        if(null == setmeal){
+            return Result.error(MessageConstant.SETMEAL_NOT_EXIST);
+        }
+
+        SetmealVO setmealVO =  new SetmealVO();
+
+        BeanUtils.copyProperties(setmeal,setmealVO);
+
+        LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper1 = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper1.eq(SetmealDish::getSetmealId,setmeal.getId());
+
+        List<SetmealDish> setmealDishes = setmealDishService.list(lambdaQueryWrapper1);
+
+        setmealVO.setSetmealDishes(setmealDishes);
+
+        return Result.success(setmealVO);
+    }
+
+    @PutMapping
+    @Transactional
+    @CacheEvict(value = "setmeal",allEntries = true)
+    @ApiOperation("修改套餐")
+    public Result<String> update(@RequestBody SetmealDTO setmealDTO){
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO,setmeal);
+
+        setmealService.updateById(setmeal);
+
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+
+        LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(SetmealDish::getSetmealId,setmeal.getId());
+
+        setmealDishService.remove(lambdaQueryWrapper);
+
+        for(SetmealDish setmealDish : setmealDishes){
+            setmealDish.setSetmealId(setmeal.getId());
+        }
+
+        setmealDishService.saveBatch(setmealDishes);
+
+        return Result.success(MessageConstant.UPDATE_SUCCESS);
+    }
 }
