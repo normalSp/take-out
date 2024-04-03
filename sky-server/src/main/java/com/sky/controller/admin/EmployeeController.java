@@ -11,7 +11,9 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
+import com.sky.exception.PasswordErrorException;
 import com.sky.properties.JwtProperties;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
@@ -203,5 +205,28 @@ public class EmployeeController {
             return Result.success(MessageConstant.ACCOUNT_EDIT_SUCCEED);
         }
         return Result.error(MessageConstant.ACCOUNT_NOT_FOUND);
+    }
+
+    @PutMapping("/editPassword")
+    @ApiOperation("修改密码")
+    public Result<String> editPassword(@RequestBody PasswordEditDTO passwordEditDTO){
+        passwordEditDTO.setEmpId(BaseContext.getCurrentId());
+
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Employee::getId, passwordEditDTO.getEmpId());
+
+        Employee employee = employeeService.getOne(lambdaQueryWrapper);
+
+        if(null == employee){
+            return Result.error(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+        if(!Objects.equals(employee.getPassword(), DigestUtils.md5Hex(passwordEditDTO.getOldPassword()))){
+            throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
+        }
+
+        employee.setPassword(DigestUtils.md5Hex(passwordEditDTO.getNewPassword()));
+        employeeService.updateById(employee);
+
+        return Result.success(MessageConstant.UPDATE_SUCCESS);
     }
 }
