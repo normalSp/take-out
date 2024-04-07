@@ -13,6 +13,9 @@ sky:
     access-key-secret: Hv0t8CKG2FO8I
     access-key-secret1: IR28QhHNf0FpusiRg
     bucket-name: plumsnow
+  wechat:
+    appid: wx6ac27855b9675112
+    secret: fb1731ec91f5a8ffa5b44ab19fac3991
 
 spring:
   redis:
