@@ -65,12 +65,11 @@ public interface CategoryMapper{
      * @param type
      * @return
      */
-    @Select("SELECT *\n" +
-            "FROM category\n" +
-            "WHERE status = 1\n" +
-            "  AND (type IS NULL OR type = #{type})\n" +
-            "ORDER BY sort ASC, create_time DESC")
+    @Select("SELECT * FROM category WHERE status = 1 AND type = #{type}")
     List<Category> list(Integer type);
+
+    @Select("SELECT * FROM category WHERE status = 1 AND type like concat('%')")
+    List<Category> listWithoutType();
 
     /**
      * 根据id查询分类

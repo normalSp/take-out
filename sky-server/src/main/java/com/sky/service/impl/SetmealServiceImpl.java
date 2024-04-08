@@ -30,6 +30,13 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * @return
      */
     public List<Setmeal> list(Setmeal setmeal) {
+        if(null == setmeal.getCategoryId() && null!= setmeal.getStatus()){
+            List<Setmeal> list = setmealMapper.listWithoutCategoryId(setmeal);
+        } else if (null != setmeal.getCategoryId() && null == setmeal.getStatus()) {
+            List<Setmeal> list = setmealMapper.listWithoutStatus(setmeal);
+        } else if (null == setmeal.getCategoryId() && null == setmeal.getStatus()) {
+            List<Setmeal> list = setmealMapper.listWithoutCategoryIdAndStatus(setmeal);
+        }
         List<Setmeal> list = setmealMapper.list(setmeal);
         return list;
     }

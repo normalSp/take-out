@@ -1,5 +1,6 @@
 package com.sky.controller.user;
 
+import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
 import com.sky.properties.JwtProperties;
@@ -22,7 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user/user")
 @ApiOperation("用户模块相关接口")
-public class userController {
+public class UserController {
 
     @Autowired
     private UserService userService;
@@ -39,6 +40,7 @@ public class userController {
 
         //生成jwt令牌
         Map<String, Object> claims = new HashMap<>();
+        claims.put(JwtClaimsConstant.USER_ID,user.getId());
         String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
 
         UserLoginVO userLoginVO = UserLoginVO.builder()

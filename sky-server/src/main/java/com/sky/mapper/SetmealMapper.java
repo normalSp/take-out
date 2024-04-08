@@ -24,7 +24,17 @@ public interface SetmealMapper extends BaseMapper<Setmeal> {
      * @param setmeal
      * @return
      */
+    @Select("select * from setmeal where name like concat('%',#{name},'%') and category_id = #{categoryId} and status = #{status} order by update_time desc;")
     List<Setmeal> list(Setmeal setmeal);
+
+    @Select("select * from setmeal where name like concat('%',#{name},'%') and status = #{status} order by update_time desc;")
+    List<Setmeal> listWithoutCategoryId(Setmeal setmeal);
+
+    @Select("select * from setmeal where name like concat('%',#{name},'%') and category_id = #{categoryId} order by update_time desc;")
+    List<Setmeal> listWithoutStatus(Setmeal setmeal);
+
+    @Select("select * from setmeal where name like concat('%',#{name},'%')order by update_time desc;")
+    List<Setmeal> listWithoutCategoryIdAndStatus(Setmeal setmeal);
 
     /**
      * 根据套餐id查询菜品选项

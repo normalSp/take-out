@@ -74,7 +74,17 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      * @return
      */
     public List<DishVO> listWithFlavor(Dish dish) {
-        //TODO:DishServiceImpl.listWithFlavor.dishMapper.list(dish); 有问题，xml用不了，需要在外部对name、category_id、status判空
+        if(null == dish.getName()){
+            dish.setName("");
+        }
+        if(null == dish.getCategoryId() && null != dish.getStatus()){
+            List<Dish> dishList = dishMapper.listWithoutCategoryId(dish);
+        } else if (null != dish.getCategoryId() && null == dish.getStatus()) {
+            List<Dish> dishList = dishMapper.listWithoutStatus(dish);
+        } else if (null == dish.getCategoryId() && null == dish.getStatus()) {
+            List<Dish> dishList = dishMapper.listWithoutStatusAndCategoryId(dish);
+        }
+
         List<Dish> dishList = dishMapper.list(dish);
 
         List<DishVO> dishVOList = new ArrayList<>();
