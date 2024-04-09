@@ -1,8 +1,10 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.sky.WebSocket.WebSocketServer;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.entity.Orders;
@@ -18,6 +20,8 @@ import com.sky.vo.OrderPaymentVO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> implements OrdersService {
@@ -30,6 +34,8 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     private UserService userService;
     @Autowired
     private OrdersService ordersService;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 订单支付
@@ -62,7 +68,6 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
 
     /**
      * 支付成功，修改订单状态
-     *
      * @param outTradeNo
      */
     public void paySuccess(String outTradeNo) {
@@ -82,6 +87,14 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         lambdaUpdateWrapper.eq(Orders::getId, ordersDB.getId());
         ordersService.update(orders, lambdaUpdateWrapper);
 
+        //通过WebSocket向客户端发送消息
+        Map map = new HashMap();
+        map.put("type", 1);
+        map.put("orderId", ordersDB.getId());
+        map.put("orderNumber", "订单号：" + ordersDB.getNumber());
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
 

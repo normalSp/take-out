@@ -1,13 +1,16 @@
 package com.sky.controller.user;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sky.WebSocket.WebSocketServer;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
+import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
@@ -28,7 +31,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController("userOrderController")
 @RequestMapping("/user/order")
@@ -46,6 +51,8 @@ public class OrderController {
     private ShoppingCartService shoppingCartService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @PostMapping("/submit")
     @ApiOperation("订单提交")
@@ -153,5 +160,32 @@ public class OrderController {
         pageResult.setRecords(page_.getRecords());
 
         return Result.success(pageResult);
+    }
+
+    /**
+     * 客户催单
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("客户催单")
+    public Result reminder(@PathVariable("id") Long id){
+        LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Orders::getId,id);
+        Orders orders = ordersService.getOne(lambdaQueryWrapper);
+
+        if(null == orders){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        Map map = new HashMap<>();
+        map.put("type", 2);
+        map.put("orderId", id);
+        map.put("cintent", "订单号：" + orders.getId());
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
+
+        return Result.success();
     }
 }
