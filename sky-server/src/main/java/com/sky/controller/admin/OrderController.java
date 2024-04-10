@@ -59,7 +59,7 @@ public class OrderController {
         ordersService.page(page, lambdaQueryWrapper);
 
         if(0 == page.getTotal()){
-            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+            return Result.error(MessageConstant.ORDER_NOT_FOUND);
         }
 
         List<OrderVO> orderVOList = new ArrayList<>();
