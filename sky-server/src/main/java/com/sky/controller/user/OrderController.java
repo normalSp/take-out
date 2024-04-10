@@ -2,6 +2,7 @@ package com.sky.controller.user;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.WebSocket.WebSocketServer;
 import com.sky.constant.MessageConstant;
@@ -19,21 +20,26 @@ import com.sky.service.OrdersService;
 import com.sky.service.ShoppingCartService;
 import com.sky.service.UserService;
 import com.sky.service.impl.OrderDetailService;
+import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController("userOrderController")
 @RequestMapping("/user/order")
@@ -53,6 +59,8 @@ public class OrderController {
     private UserService userService;
     @Autowired
     private WebSocketServer webSocketServer;
+    @Autowired
+    private WeChatPayUtil weChatPayUtil;
 
     @PostMapping("/submit")
     @ApiOperation("订单提交")
@@ -137,7 +145,6 @@ public class OrderController {
     }
 
     /**
-     * TODO 历史订单查询
      * 历史订单查询
      * @param page
      * @param pageSize
@@ -155,11 +162,59 @@ public class OrderController {
 
         ordersService.page(page_,lambdaQueryWrapper);
 
-        PageResult pageResult = new PageResult();
-        pageResult.setTotal(page_.getTotal());
-        pageResult.setRecords(page_.getRecords());
+        if(0 == page_.getTotal()){
+            return Result.error(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        List<OrderVO> orderVOList = new ArrayList<>();
+        List<Orders> ordersList = page_.getRecords();
+
+        for(Orders orders : ordersList){
+            OrderVO orderVO = new OrderVO();
+            BeanUtils.copyProperties(orders, orderVO);
+
+            // 查询订单菜品详情信息（订单中的菜品和数量）
+            LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper4OrderDetail = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper4OrderDetail.eq(OrderDetail::getOrderId, orders.getId());
+            List<OrderDetail> orderDetailList = orderDetailService.list(lambdaQueryWrapper4OrderDetail);
+
+            // 将每一条订单菜品信息拼接为字符串（格式：宫保鸡丁*3；）
+            List<String> orderDishList = orderDetailList.stream().map(x -> {
+                String orderDish = x.getName() + "*" + x.getNumber() + ";";
+                return orderDish;
+            }).collect(Collectors.toList());
+
+            // 将该订单对应的所有菜品信息拼接在一起
+            String join = String.join("", orderDishList);
+
+            orderVO.setOrderDishes(join);
+            orderVO.setOrderDetailList(orderDetailList);
+
+            orderVOList.add(orderVO);
+        }
+
+
+        PageResult pageResult = new PageResult(page_.getTotal(), orderVOList);
 
         return Result.success(pageResult);
+    }
+
+    @GetMapping("/orderDetail/{id}")
+    @ApiOperation("根据id查询订单")
+    public Result<OrderVO> getOrderById(@PathVariable Long id){
+        LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Orders::getId, id);
+        Orders orders = ordersService.getOne(lambdaQueryWrapper);
+
+        LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper4OrderDetail = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper4OrderDetail.eq(OrderDetail::getOrderId, orders.getId());
+        List<OrderDetail> orderDetails = orderDetailService.list(lambdaQueryWrapper4OrderDetail);
+
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(orders, orderVO);
+        orderVO.setOrderDetailList(orderDetails);
+
+        return Result.success(orderVO);
     }
 
     /**
@@ -187,5 +242,49 @@ public class OrderController {
         webSocketServer.sendToAllClient(json);
 
         return Result.success();
+    }
+
+    @Transactional
+    @PutMapping("/cancel/{id}")
+    @ApiOperation("取消订单")
+    public Result<String> cancel(@PathVariable Long id) throws Exception {
+        LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Orders::getId,id);
+        Orders orders = ordersService.getOne(lambdaQueryWrapper);
+
+        // 校验订单是否存在
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        //订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
+        if (orders.getStatus() > 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        //支付状态
+        Integer payStatus = orders.getPayStatus();
+        if (payStatus == Orders.TO_BE_CONFIRMED) {
+            //用户已支付，需要退款
+            String refund = weChatPayUtil.refund(
+                    orders.getNumber(),
+                    orders.getNumber(),
+                    new BigDecimal("0.01"),
+                    new BigDecimal("0.01"));
+            log.info("申请退款：{}", refund);
+            //支付状态修改为 退款
+            orders.setPayStatus(Orders.REFUND);
+        }
+
+        // 更新订单状态、取消原因、取消时间
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason("用户取消");
+        orders.setCancelTime(LocalDateTime.now());
+
+        LambdaUpdateWrapper<Orders> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        lambdaUpdateWrapper.eq(Orders::getId, id);
+        ordersService.update(orders, lambdaUpdateWrapper);
+
+        return Result.success(MessageConstant.ORDER_CANCEL_SUCCESS);
     }
 }

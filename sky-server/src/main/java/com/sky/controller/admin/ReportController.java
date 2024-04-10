@@ -1,5 +1,7 @@
 package com.sky.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sky.entity.Orders;
 import com.sky.result.Result;
 import com.sky.vo.TurnoverReportVO;
 import io.swagger.annotations.Api;
@@ -25,6 +27,9 @@ public class ReportController {
     public Result<TurnoverReportVO> turnoverReport(
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+
+        LambdaQueryWrapper<Orders> lambdaQueryWrapper  = new LambdaQueryWrapper<>();
+
 
 
 
