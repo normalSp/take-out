@@ -6,6 +6,7 @@ import com.sky.entity.User;
 import com.sky.result.Result;
 import com.sky.service.OrdersService;
 import com.sky.service.UserService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
@@ -131,5 +132,72 @@ public class ReportController {
         String userNewCountString = StringUtils.join(userNewCountList, ",");
 
         return Result.success(new UserReportVO(dateJoin, userTotalCountString, userNewCountString));
+    }
+
+
+    @GetMapping("/ordersStatistics")
+    public Result<OrderReportVO> ordersStatistics(
+            @DateTimeFormat(pattern = "yyyy-MM-dd")  LocalDate begin,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+
+        List<LocalDate> dataList = new ArrayList<>();
+
+        LocalDate l = begin;
+        while(!l.isEqual(end)){
+            l = l.plusDays(1);
+            dataList.add(l);
+        }
+
+        String dateJoin = StringUtils.join(dataList, ",");
+
+        LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.between(Orders::getOrderTime, begin, end);
+        List<Orders> ordersList = ordersService.list(lambdaQueryWrapper);
+
+        List<Integer> orderTotalCountList = new ArrayList<>();
+        List<Integer> orderEffectiveCountList = new ArrayList<>();
+
+        for(LocalDate date : dataList){
+            Integer orderTotalCount = 0;
+            Integer orderEffectiveCount = 0;
+
+            for(Orders orders : ordersList){
+                if(orders.getOrderTime().isAfter(LocalDateTime.of(date, LocalTime.MIN)) && orders.getOrderTime().isBefore(LocalDateTime.of(date, LocalTime.MAX))) {
+                    if (Objects.equals(orders.getStatus(), Orders.COMPLETED)) {
+                        orderEffectiveCount++;
+                    }
+                    orderTotalCount++;
+                }
+            }
+            
+            orderTotalCountList.add(orderTotalCount);
+            orderEffectiveCountList.add(orderEffectiveCount);
+        }
+
+        String orderCountList = StringUtils.join(orderTotalCountList, ",");
+        String validOrderCountList = StringUtils.join(orderEffectiveCountList, ",");
+
+        Integer orderTotalCount = 0;
+        for(Integer i : orderTotalCountList){
+            orderTotalCount += i;
+        }
+
+        Integer orderEffectiveCount = 0;
+        for(Integer i : orderEffectiveCountList){
+            orderEffectiveCount += i;
+        }
+
+        // 订单完成率
+        Double orderCompletionRate = orderEffectiveCount * 1.0 / orderTotalCount;
+
+        OrderReportVO orderReportVO = new OrderReportVO(
+                dateJoin,
+                orderCountList,
+                validOrderCountList,
+                orderTotalCount,
+                orderEffectiveCount,
+                orderCompletionRate);
+
+        return Result.success(orderReportVO);
     }
 }
