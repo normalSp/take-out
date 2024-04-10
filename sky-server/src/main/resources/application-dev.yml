@@ -1,11 +1,15 @@
 sky:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    host: 39.106.77.183
+    # 学生认证弄的阿里云服务器ip：8.130.106.145
+    # mysql和redis密码：Aa565034470
+    # 老的试用服务器ip：39.106.77.183
+    # mysql和redis密码：565034470
+    host: 8.130.106.145
     port: 3306
     database: sky_take_out
     username: root
-    password: 565034470
+    password: Aa565034470
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
     access-key-id: LTAI5tMHJgr6
@@ -29,9 +33,9 @@ sky:
 
 spring:
   redis:
-    host: 39.106.77.183
+    host: 8.130.106.145
     port: 6379
-    password: 565034470
+    password: Aa565034470
     database: 0 #操作的是0号数据库
     jedis:
       #Redis连接池配置
