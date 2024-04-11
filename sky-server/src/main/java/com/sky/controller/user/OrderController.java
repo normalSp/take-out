@@ -287,4 +287,26 @@ public class OrderController {
 
         return Result.success(MessageConstant.ORDER_CANCEL_SUCCESS);
     }
+    
+    @PostMapping("/repetition/{id}")
+    @ApiOperation("再来一单")
+    public Result<String> repetition(@PathVariable String id){
+        LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(OrderDetail::getOrderId,id);
+        List<OrderDetail> orderDetailList = orderDetailService.list(lambdaQueryWrapper);
+
+        List<ShoppingCart> shoppingCartList = new ArrayList<>();
+
+        for(OrderDetail orderDetail : orderDetailList){
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail,shoppingCart);
+
+            shoppingCart.setUserId(BaseContext.getCurrentId());
+            shoppingCartList.add(shoppingCart);
+        }
+
+        shoppingCartService.saveBatch(shoppingCartList);
+
+        return Result.success(MessageConstant.SAVE_SUCCESS);
+    }
 }
