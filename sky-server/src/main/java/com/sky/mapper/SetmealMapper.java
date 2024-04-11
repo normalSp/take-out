@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface SetmealMapper extends BaseMapper<Setmeal> {
@@ -45,5 +46,14 @@ public interface SetmealMapper extends BaseMapper<Setmeal> {
             "from setmeal_dish sd left join dish d on sd.dish_id = d.id " +
             "where sd.setmeal_id = #{setmealId}")
     List<DishItemVO> getDishItemBySetmealId(Long setmealId);
+
+
+    /**
+     * 根据条件统计套餐数量
+     * @param map
+     * @return
+     */
+    @Select("select count(id) from setmeal where status = #{status}")
+    Integer countByMap(Map map);
 
 }

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DishMapper extends BaseMapper<Dish> {
@@ -47,4 +48,12 @@ public interface DishMapper extends BaseMapper<Dish> {
             "and status like concat('%') " +
             "order by create_time desc")
     List<Dish> listWithoutStatusAndCategoryId(Dish dish);
+
+    /**
+     * 根据条件统计菜品数量
+     * @param map
+     * @return
+     */
+    @Select("select count(id) from dish where status = #{status}")
+    Integer countByMap(Map map);
 }
