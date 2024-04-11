@@ -32,6 +32,7 @@
         <poi>3.16</poi>
         <mp>3.4.1</mp>
         <httpclient>4.5.13</httpclient>
+        <poi>3.16</poi>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -40,6 +41,18 @@
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>${mybatis.spring}</version>
             </dependency>-->
+
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
