@@ -11,6 +11,7 @@ import com.sky.entity.Orders;
 import com.sky.entity.User;
 import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.OrdersMapper;
+import com.sky.properties.WeChatProperties;
 import com.sky.service.OrdersService;
 import com.sky.service.UserService;
 import com.sky.utils.WeChatPayUtil;
@@ -55,6 +56,9 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
                 "苍穹外卖订单", //商品描述
                 user.getOpenid() //微信用户的openid
         );
+
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("notify_url", weChatProperties.getNotifyUrl());
 
         if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
             throw new OrderBusinessException("该订单已支付");

@@ -112,6 +112,7 @@ public class OrderController {
             OrderDetail orderDetail = new OrderDetail();
             BeanUtils.copyProperties(shoppingCart,orderDetail);
             orderDetail.setOrderId(orders.getId());
+            orderDetail.setId(null);
             orderDetails.add(orderDetail);
         }
         orderDetailService.saveBatch(orderDetails);

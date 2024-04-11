@@ -131,7 +131,7 @@ public class WeChatPayUtil {
      * @param openid      微信用户的openid
      * @return
      */
-    private String jsapi(String orderNum, BigDecimal total, String description, String openid) throws Exception {
+    public String jsapi(String orderNum, BigDecimal total, String description, String openid) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("appid", weChatProperties.getAppid());
         jsonObject.put("mchid", weChatProperties.getMchid());
