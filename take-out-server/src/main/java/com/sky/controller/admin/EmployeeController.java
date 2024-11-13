@@ -110,6 +110,7 @@ public class EmployeeController {
                 .idNumber(employeeDTO.getIdNumber())
                 .password(DigestUtils.md5Hex(PasswordConstant.DEFAULT_PASSWORD))
                 .status(StatusConstant.ENABLE)
+                .shopId(BaseContext.getCurrentShopId())
                 .build();
 
         employeeService.save(employee);
@@ -120,7 +121,6 @@ public class EmployeeController {
 
     @GetMapping("/page")
     @ApiOperation("分页查询员工")
-    @Cacheable(value = "employee")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
         log.info("分页查询员工：{}", employeePageQueryDTO);
 
@@ -130,6 +130,10 @@ public class EmployeeController {
 
         lambdaQueryWrapper.like(StringUtils.isNotBlank(employeePageQueryDTO.getName()),
                 Employee::getName, employeePageQueryDTO.getName());
+
+        //仅查询当前商家的所属员工
+        Long currentShopId = BaseContext.getCurrentShopId();
+        lambdaQueryWrapper.eq(Employee::getShopId, currentShopId);
 
         lambdaQueryWrapper.orderByDesc(Employee::getUpdateTime);
 
@@ -181,6 +185,7 @@ public class EmployeeController {
 
         LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Employee::getId, id);
+        lambdaQueryWrapper.eq(Employee::getShopId, BaseContext.getCurrentShopId());
         Employee employee = employeeService.getOne(lambdaQueryWrapper);
 
         return Result.success(employee);

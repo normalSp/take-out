@@ -27,7 +27,7 @@ public interface CategoryMapper{
      * @param categoryPageQueryDTO
      * @return
      */
-    @Select(" SELECT * FROM category WHERE ((name like concat('%',#{name},'%')) AND (type LIKE concat('%',#{type}))) ")
+    @Select(" SELECT * FROM category WHERE ((name like concat('%',#{name},'%')) AND (type LIKE concat('%',#{type})) AND shop_id = #{shopId}) ")
     Page<Category> pageQuery(CategoryPageQueryDTO categoryPageQueryDTO);
 
     /**
@@ -35,7 +35,7 @@ public interface CategoryMapper{
      * @param categoryPageQueryDTO
      * @return
      */
-    @Select(" SELECT * FROM category WHERE ((name like concat('%',#{name},'%')) AND (type LIKE concat('%'))) ")
+    @Select(" SELECT * FROM category WHERE ((name like concat('%',#{name},'%')) AND (type LIKE concat('%')) AND shop_id = #{shopId}) ")
     Page<Category> pageQuery1(CategoryPageQueryDTO categoryPageQueryDTO);
 
     /**

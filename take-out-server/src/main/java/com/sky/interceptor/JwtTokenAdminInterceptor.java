@@ -1,7 +1,10 @@
 package com.sky.interceptor;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,9 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
     @Autowired
     private JwtProperties jwtProperties;
+
+    @Autowired
+    private EmployeeService employeeService;
 
     /**
      * 校验jwt
@@ -49,6 +55,10 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
             log.info("当前员工id：{}", empId);
             BaseContext.setCurrentId(empId);
+
+            Employee employee = employeeService.getById(empId);
+            BaseContext.setCurrentShopId(employee.getShopId());
+
             //3、通过，放行
             return true;
         } catch (Exception ex) {

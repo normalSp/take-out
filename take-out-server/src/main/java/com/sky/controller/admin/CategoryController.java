@@ -1,5 +1,8 @@
 package com.sky.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
@@ -9,6 +12,7 @@ import com.sky.service.CategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,7 +41,12 @@ public class CategoryController {
     @CacheEvict(value = "category", allEntries = true)
     public Result<String> save(@RequestBody CategoryDTO categoryDTO){
         log.info("新增分类：{}", categoryDTO);
-        categoryService.save(categoryDTO);
+
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryDTO, category);
+        category.setShopId(BaseContext.getCurrentShopId());
+
+        categoryService.save(category);
         return Result.success();
     }
 
@@ -48,10 +57,14 @@ public class CategoryController {
      */
     @GetMapping("/page")
     @ApiOperation("分类分页查询")
-    @Cacheable(value = "category")
+    //@Cacheable(value = "category")
     public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO){
+        Long currentShopId = BaseContext.getCurrentShopId();
+        categoryPageQueryDTO.setShopId(currentShopId);
+
         log.info("分页查询：{}", categoryPageQueryDTO);
         PageResult pageResult = categoryService.pageQuery(categoryPageQueryDTO);
+
         return Result.success(pageResult);
     }
 

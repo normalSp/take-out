@@ -2,10 +2,12 @@ package com.sky.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -13,37 +15,38 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category implements Serializable {
+public class Employee implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Long id;
 
-    //类型: 1菜品分类 2套餐分类
-    private Integer type;
+    private String username;
 
-    //分类名称
     private String name;
 
-    //顺序
-    private Integer sort;
+    private String password;
 
-    //分类状态 0标识禁用 1表示启用
+    private String phone;
+
+    private String sex;
+
+    private String idNumber;
+
     private Integer status;
 
-    //创建时间
+    private Long shopId;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    //更新时间
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
-    //创建人
     @TableField(fill = FieldFill.INSERT)
     private Long createUser;
 
-    //修改人
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
+
 }

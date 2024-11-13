@@ -11,9 +11,9 @@ public interface CategoryService{
 
     /**
      * 新增分类
-     * @param categoryDTO
+     * @param category
      */
-    void save(CategoryDTO categoryDTO);
+    void save(Category category);
 
     /**
      * 分页查询
