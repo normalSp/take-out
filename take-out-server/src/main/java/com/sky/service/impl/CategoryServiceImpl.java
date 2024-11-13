@@ -1,6 +1,5 @@
 package com.sky.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -43,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
      * 新增分类
      * @param categoryDTO
      */
-    public void save(CategoryDTO categoryDTO) {
+    public void save(Category categoryDTO) {
         Category category = new Category();
         //属性拷贝
         BeanUtils.copyProperties(categoryDTO, category);

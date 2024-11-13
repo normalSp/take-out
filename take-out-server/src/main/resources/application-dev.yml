@@ -5,9 +5,9 @@ sky:
     # mysql和redis密码：Aa565034470
     # 老的试用服务器ip：39.106.77.183
     # mysql和redis密码：565034470
-    host: 8.130.106.145
+    host: localhost
     port: 3306
-    database: sky_take_out
+    database: mixdp
     username: root
     password: Aa565034470
   alioss:
@@ -33,7 +33,7 @@ sky:
 
 spring:
   redis:
-    host: 8.130.106.145
+    host: localhost
     port: 6379
     password: Aa565034470
     database: 0 #操作的是0号数据库

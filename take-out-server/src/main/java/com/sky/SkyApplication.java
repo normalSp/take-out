@@ -18,6 +18,6 @@ public class SkyApplication {
     public static void main(String[] args) {
         SpringApplication.run(SkyApplication.class, args);
         log.info("server started");
-        log.info("sky？ 启动！");
+        log.info("毕设？ 启动！");
     }
 }
