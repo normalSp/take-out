@@ -21,17 +21,17 @@ public interface OrdersMapper extends BaseMapper<Orders> {
      * @param map
      * @return
      */
-    @Select("select count(id) from orders where order_time > #{begin} and order_time < #{end} and status = #{status}")
-    Integer countByMap(Map map);
+    @Select("select count(id) from orders where order_time > #{begin} and order_time < #{end} and status = #{status}  AND shop_id = #{shopId}")
+    Integer countByMap(Map map, Long shopId);
 
-    @Select("select count(id) from orders where order_time > #{begin} and order_time < #{end}")
-    Integer countByMapWithoutStatus(Map map);
+    @Select("select count(id) from orders where order_time > #{begin} and order_time < #{end} AND shop_id = #{shopId}")
+    Integer countByMapWithoutStatus(Map map, Long shopId);
 
     /**
      * 根据动态条件统计营业额数据
      * @param map
      * @return
      */
-    @Select("select sum(amount) from orders where order_time > #{begin} and order_time < #{end} and status = #{status} ")
-    Double sumByMap(Map map);
+    @Select("select sum(amount) from orders where order_time > #{begin} and order_time < #{end} and status = #{status} AND shop_id = #{shopId}")
+    Double sumByMap(Map map, Long shopId);
 }

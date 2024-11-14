@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sky.context.BaseContext;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
 import com.sky.entity.User;
@@ -71,6 +72,7 @@ public class ReportController {
 
         LambdaQueryWrapper<Orders> lambdaQueryWrapper  = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.between(Orders::getOrderTime, begin, end);
+        lambdaQueryWrapper.eq(Orders::getShopId, BaseContext.getCurrentShopId());
         List<Orders> ordersList = ordersService.list(lambdaQueryWrapper);
 
         List<BigDecimal> turnoverList = new ArrayList<>();
@@ -162,6 +164,7 @@ public class ReportController {
 
         LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.between(Orders::getOrderTime, begin, end);
+        lambdaQueryWrapper.eq(Orders::getShopId, BaseContext.getCurrentShopId());
         List<Orders> ordersList = ordersService.list(lambdaQueryWrapper);
 
         List<Integer> orderTotalCountList = new ArrayList<>();
@@ -229,6 +232,7 @@ public class ReportController {
 
         LambdaQueryWrapper<Orders> lambdaQueryWrapper4Orders = new LambdaQueryWrapper<>();
         lambdaQueryWrapper4Orders.between(Orders::getOrderTime, begin, end);
+        lambdaQueryWrapper4Orders.eq(Orders::getShopId, BaseContext.getCurrentShopId());
         List<Orders> ordersList = ordersService.list(lambdaQueryWrapper4Orders);
 
         Map<String, Integer> map = new HashMap<>();
@@ -236,6 +240,7 @@ public class ReportController {
         for(Orders orders : ordersList){
             if(Objects.equals(orders.getStatus(), Orders.COMPLETED)){
                 LambdaQueryWrapper<OrderDetail> lamdaQueryWrapper4OrderDetail = new LambdaQueryWrapper<>();
+                lamdaQueryWrapper4OrderDetail.eq(OrderDetail::getShopId, BaseContext.getCurrentShopId());
                 lamdaQueryWrapper4OrderDetail.eq(OrderDetail::getOrderId, orders.getId());
                 List<OrderDetail> orderDetailList = ordersDetailService.list(lamdaQueryWrapper4OrderDetail);
 

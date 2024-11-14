@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.entity.Orders;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.OrdersMapper;
@@ -52,15 +53,15 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         map.put("end",end);
 
         //查询总订单数
-        Integer totalOrderCount = orderMapper.countByMapWithoutStatus(map);
+        Integer totalOrderCount = orderMapper.countByMapWithoutStatus(map, BaseContext.getCurrentShopId());
 
         map.put("status", Orders.COMPLETED);
         //营业额
-        Double turnover = orderMapper.sumByMap(map);
+        Double turnover = orderMapper.sumByMap(map, BaseContext.getCurrentShopId());
         turnover = turnover == null? 0.0 : turnover;
 
         //有效订单数
-        Integer validOrderCount = orderMapper.countByMap(map);
+        Integer validOrderCount = orderMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         Double unitPrice = 0.0;
 
@@ -97,23 +98,23 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         map.put("status", Orders.TO_BE_CONFIRMED);
 
         //待接单
-        Integer waitingOrders = orderMapper.countByMap(map);
+        Integer waitingOrders = orderMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         //待派送
         map.put("status", Orders.CONFIRMED);
-        Integer deliveredOrders = orderMapper.countByMap(map);
+        Integer deliveredOrders = orderMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         //已完成
         map.put("status", Orders.COMPLETED);
-        Integer completedOrders = orderMapper.countByMap(map);
+        Integer completedOrders = orderMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         //已取消
         map.put("status", Orders.CANCELLED);
-        Integer cancelledOrders = orderMapper.countByMap(map);
+        Integer cancelledOrders = orderMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         //全部订单
         map.put("status", null);
-        Integer allOrders = orderMapper.countByMapWithoutStatus(map);
+        Integer allOrders = orderMapper.countByMapWithoutStatus(map, BaseContext.getCurrentShopId());
 
         return OrderOverViewVO.builder()
                 .waitingOrders(waitingOrders)
@@ -132,10 +133,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public DishOverViewVO getDishOverView() {
         Map map = new HashMap();
         map.put("status", StatusConstant.ENABLE);
-        Integer sold = dishMapper.countByMap(map);
+        Integer sold = dishMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         map.put("status", StatusConstant.DISABLE);
-        Integer discontinued = dishMapper.countByMap(map);
+        Integer discontinued = dishMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         return DishOverViewVO.builder()
                 .sold(sold)
@@ -151,10 +152,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public SetmealOverViewVO getSetmealOverView() {
         Map map = new HashMap();
         map.put("status", StatusConstant.ENABLE);
-        Integer sold = setmealMapper.countByMap(map);
+        Integer sold = setmealMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         map.put("status", StatusConstant.DISABLE);
-        Integer discontinued = setmealMapper.countByMap(map);
+        Integer discontinued = setmealMapper.countByMap(map, BaseContext.getCurrentShopId());
 
         return SetmealOverViewVO.builder()
                 .sold(sold)
