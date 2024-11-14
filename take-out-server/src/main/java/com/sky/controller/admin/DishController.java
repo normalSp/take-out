@@ -231,7 +231,6 @@ public class DishController {
         lambdaQueryWrapper.orderByDesc(Dish::getUpdateTime);
 
         List<Dish> dishList = dishService.list(lambdaQueryWrapper);
-
         return Result.success(dishList);
     }
 }
