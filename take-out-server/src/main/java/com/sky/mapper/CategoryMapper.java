@@ -66,10 +66,10 @@ public interface CategoryMapper{
      * @return
      */
     @Select("SELECT * FROM category WHERE status = 1 AND type = #{type} AND shop_id = #{shopId}")
-    List<Category> list(Integer type);
+    List<Category> list(Integer type, Long shopId);
 
     @Select("SELECT * FROM category WHERE status = 1 AND type like concat('%') AND shop_id = #{shopId}")
-    List<Category> listWithoutType();
+    List<Category> listWithoutType(Long shopId);
 
     /**
      * 根据id查询分类

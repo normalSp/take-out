@@ -151,9 +151,9 @@ public class CategoryServiceImpl implements CategoryService {
      */
     public List<Category> list(Integer type) {
         if(null != type){
-            return categoryMapper.list(type);
+            return categoryMapper.list(type, BaseContext.getCurrentShopId());
         }
-        return categoryMapper.listWithoutType();
+        return categoryMapper.listWithoutType(BaseContext.getCurrentShopId());
     }
 
     /**

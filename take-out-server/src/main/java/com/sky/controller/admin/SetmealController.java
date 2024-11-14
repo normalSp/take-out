@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Category;
@@ -41,7 +42,7 @@ public class SetmealController {
 
     @GetMapping("/page")
     @ApiOperation("套餐分页查询")
-    @Cacheable(value = "setmeal")
+    //@Cacheable(value = "setmeal")
     @Transactional
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO){
         log.info("套餐分页查询:{}",setmealPageQueryDTO);
@@ -54,6 +55,7 @@ public class SetmealController {
                 Setmeal::getCategoryId, setmealPageQueryDTO.getCategoryId());
         lambdaQueryWrapper.eq(null != setmealPageQueryDTO.getStatus(),
                 Setmeal::getStatus, setmealPageQueryDTO.getStatus());
+        lambdaQueryWrapper.eq(Setmeal::getShopId, BaseContext.getCurrentShopId());
         lambdaQueryWrapper.orderByDesc(Setmeal::getUpdateTime);
 
         setmealService.page(page, lambdaQueryWrapper);
@@ -86,6 +88,7 @@ public class SetmealController {
     public Result<String> save(@RequestBody SetmealDTO setmealDTO){
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO,setmeal);
+        setmeal.setShopId(BaseContext.getCurrentShopId());
 
         setmealService.save(setmeal);
 
@@ -107,6 +110,7 @@ public class SetmealController {
     public Result<SetmealVO> getById(@PathVariable Long id){
         LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Setmeal::getId,id);
+        lambdaQueryWrapper.eq(Setmeal::getShopId, BaseContext.getCurrentShopId());
 
         Setmeal setmeal = setmealService.getOne(lambdaQueryWrapper);
 

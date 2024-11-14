@@ -41,6 +41,9 @@ public class Setmeal implements Serializable {
     //图片
     private String image;
 
+    //所属商店id
+    private Long shopId;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
