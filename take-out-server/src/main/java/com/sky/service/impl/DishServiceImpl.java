@@ -52,6 +52,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         dish.setCategoryId(dishDto.getCategoryId());
         dish.setImage(dishDto.getImage());
         dish.setStatus(dishDto.getStatus());
+        dish.setShopId(dishDto.getShopId());
 
         //保存菜品的基本信息到菜品表dish
         log.info("往dish表中插入信息...");

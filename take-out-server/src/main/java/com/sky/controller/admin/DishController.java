@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Category;
@@ -56,6 +57,8 @@ public class DishController {
     public Result<String> save(@RequestBody  DishDTO dishDTO){
         log.info("菜品保存信息：{}", dishDTO);
 
+        dishDTO.setShopId(BaseContext.getCurrentShopId());
+
         dishService.saveWithFlavor(dishDTO);
 
         return Result.success(MessageConstant.SAVE_SUCCESS);
@@ -65,7 +68,7 @@ public class DishController {
     @GetMapping("/page")
     @ApiOperation("分页查询菜品")
     @Transactional
-    @Cacheable(value = "dish", key = "#dishPageQueryDTO.categoryId + '_' +#dishPageQueryDTO.status")
+    //@Cacheable(value = "dish", key = "#dishPageQueryDTO.categoryId + '_' +#dishPageQueryDTO.status")
     public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO){
         log.info("分页查询菜品：{}", dishPageQueryDTO);
 
@@ -82,6 +85,7 @@ public class DishController {
                 Dish::getCategoryId, dishPageQueryDTO.getCategoryId());
         lambdaQueryWrapper.eq(null != dishPageQueryDTO.getStatus(),
                 Dish::getStatus, dishPageQueryDTO.getStatus());
+        lambdaQueryWrapper.eq(Dish::getShopId, BaseContext.getCurrentShopId());
 
         dishService.page(page, lambdaQueryWrapper);
 
@@ -174,6 +178,7 @@ public class DishController {
     public Result<DishVO> getById(@PathVariable Long id){
         LambdaQueryWrapper<Dish> lambdaQueryWrapper =  new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Dish::getId, id);
+        lambdaQueryWrapper.eq(Dish::getShopId, BaseContext.getCurrentShopId());
 
         Dish dish = dishService.getOne(lambdaQueryWrapper);
 
@@ -222,6 +227,7 @@ public class DishController {
     public Result<List<Dish>> getByCategoryId(Long categoryId){
         LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Dish::getCategoryId, categoryId);
+        lambdaQueryWrapper.eq(Dish::getShopId, BaseContext.getCurrentShopId());
         lambdaQueryWrapper.orderByDesc(Dish::getUpdateTime);
 
         List<Dish> dishList = dishService.list(lambdaQueryWrapper);

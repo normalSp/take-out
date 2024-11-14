@@ -41,6 +41,9 @@ public class Dish implements Serializable {
     //0 停售 1 起售
     private Integer status;
 
+    //所属商店id
+    private Long shopId;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
