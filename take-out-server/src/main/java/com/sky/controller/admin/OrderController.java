@@ -91,7 +91,6 @@ public class OrderController {
             orderVOList.add(orderVO);
         }
 
-
         PageResult pageResult = new PageResult(page.getTotal(), orderVOList);
 
         return Result.success(pageResult);
