@@ -44,4 +44,7 @@ public class OrderDetail implements Serializable {
 
     //图片
     private String image;
+
+    //所属商店id
+    private Long shopId;
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.MessageConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.OrdersCancelDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.OrderDetail;
@@ -53,6 +54,7 @@ public class OrderController {
         lambdaQueryWrapper.eq(null != ordersPageQueryDTO.getStatus(),  Orders::getStatus, ordersPageQueryDTO.getStatus());
         lambdaQueryWrapper.between(null != ordersPageQueryDTO.getBeginTime() && null != ordersPageQueryDTO.getEndTime(),
                 Orders::getOrderTime, ordersPageQueryDTO.getBeginTime(), ordersPageQueryDTO.getEndTime());
+        lambdaQueryWrapper.eq(Orders::getShopId, BaseContext.getCurrentShopId());
 
         Page page = new Page(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
 
@@ -103,16 +105,19 @@ public class OrderController {
         //根据状态，分别查询出待接单、待派送、派送中的订单数量
         LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Orders::getStatus, Orders.TO_BE_CONFIRMED);
+        lambdaQueryWrapper.eq(Orders::getShopId, BaseContext.getCurrentShopId());
         List<Orders> list1 = ordersService.list(lambdaQueryWrapper);
         Integer toBeConfirmed = list1.size();
 
         LambdaQueryWrapper<Orders> lambdaQueryWrapper2 = new LambdaQueryWrapper<>();
         lambdaQueryWrapper2.eq(Orders::getStatus, Orders.CONFIRMED);
+        lambdaQueryWrapper2.eq(Orders::getShopId, BaseContext.getCurrentShopId());
         List<Orders> list2 = ordersService.list(lambdaQueryWrapper2);
         Integer confirmed = list2.size();
 
         LambdaQueryWrapper<Orders> lambdaQueryWrapper3 = new LambdaQueryWrapper<>();
         lambdaQueryWrapper3.eq(Orders::getStatus, Orders.DELIVERY_IN_PROGRESS);
+        lambdaQueryWrapper3.eq(Orders::getShopId, BaseContext.getCurrentShopId());
         List<Orders> list3 = ordersService.list(lambdaQueryWrapper3);
         Integer deliveryInProgress = list3.size();
 
@@ -129,10 +134,12 @@ public class OrderController {
     public Result<OrderVO> getOrderById(@PathVariable Long id){
         LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Orders::getId, id);
+        lambdaQueryWrapper.eq(Orders::getShopId, BaseContext.getCurrentShopId());
         Orders orders = ordersService.getOne(lambdaQueryWrapper);
 
         LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper4OrderDetail = new LambdaQueryWrapper<>();
         lambdaQueryWrapper4OrderDetail.eq(OrderDetail::getOrderId, orders.getId());
+        lambdaQueryWrapper4OrderDetail.eq(OrderDetail::getShopId, BaseContext.getCurrentShopId());
         List<OrderDetail> orderDetails = ordersDetailService.list(lambdaQueryWrapper4OrderDetail);
 
         OrderVO orderVO = new OrderVO();
