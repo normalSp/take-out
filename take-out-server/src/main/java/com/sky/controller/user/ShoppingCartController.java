@@ -1,6 +1,7 @@
 package com.sky.controller.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sky.constant.RedisKeyConstant;
 import com.sky.context.BaseContext;
 import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
@@ -11,6 +12,7 @@ import com.sky.service.SetmealService;
 import com.sky.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,8 @@ public class ShoppingCartController {
     private DishService dishService;
     @Autowired
     private SetmealService setmealService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 添加购物车
@@ -43,9 +47,14 @@ public class ShoppingCartController {
         //1. 设置用户id，指定是哪个用户的购物车数据
         shoppingCart.setUserId(BaseContext.getCurrentId());
 
+        //1.1 设置商家id
+        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        shoppingCart.setShopId(shopId);
+
         //2. 查询当前菜品或套餐是否在购物车中
         LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ShoppingCart::getUserId,shoppingCart.getUserId());
+        lambdaQueryWrapper.eq(ShoppingCart::getShopId,shopId);
 
         //2.1 判断加入购物车的是菜品还是套餐
         if(null != shoppingCart.getDishId()) {
@@ -113,6 +122,9 @@ public class ShoppingCartController {
         LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
 
+        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        lambdaQueryWrapper.eq(ShoppingCart::getShopId, shopId);
+
         if(null != shoppingCart.getDishId()){
             lambdaQueryWrapper.eq(ShoppingCart::getDishId, shoppingCart.getDishId());
         }
@@ -148,6 +160,8 @@ public class ShoppingCartController {
 
         LambdaQueryWrapper<ShoppingCart>  lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
+        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        lambdaQueryWrapper.eq(ShoppingCart::getShopId, shopId);
         lambdaQueryWrapper.orderByDesc(ShoppingCart::getCreateTime);
 
         List<ShoppingCart> shoppingCarts = shoppingCartService.list(lambdaQueryWrapper);
@@ -164,6 +178,9 @@ public class ShoppingCartController {
     public Result<String> clean(){
         LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
+
+        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        lambdaQueryWrapper.eq(ShoppingCart::getShopId, shopId);
 
         shoppingCartService.remove(lambdaQueryWrapper);
 

@@ -1,6 +1,9 @@
 package com.sky.controller.user;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.constant.RedisKeyConstant;
+import com.sky.context.BaseContext;
+import com.sky.dto.DishDTO;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
 import com.sky.properties.JwtProperties;
@@ -11,6 +14,7 @@ import com.sky.vo.UserLoginVO;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +33,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtProperties jwtProperties;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/login")
     @ApiOperation("用户微信登录")
@@ -50,5 +56,17 @@ public class UserController {
                 .build();
 
         return Result.success(userLoginVO);
+    }
+
+    @PostMapping("/selectShop")
+    @ApiOperation("选择商店")
+    public Result<Long> selectShop(@RequestBody DishDTO dishDTO){
+        Long shopId = dishDTO.getShopId();
+        log.info("当前选择的商店id：{}", shopId);
+
+        //key 为 shopId + userId
+        stringRedisTemplate.opsForValue().set(RedisKeyConstant.SHOP_ID + BaseContext.getCurrentId(), String.valueOf(shopId));
+
+        return Result.success(shopId);
     }
 }

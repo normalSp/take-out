@@ -165,4 +165,18 @@ public class CategoryServiceImpl implements CategoryService {
     public Category getById(Long id) {
         return categoryMapper.selectById(id);
     }
+
+    /**
+     * 用户端根据类型查询分类
+     * @param type
+     * @param shopId
+     * @return
+     */
+    @Override
+    public List<Category> list(Integer type, Long shopId) {
+        if(null != type){
+            return categoryMapper.list(type, shopId);
+        }
+        return categoryMapper.listWithoutType(shopId);
+    }
 }

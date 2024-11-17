@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.WebSocket.WebSocketServer;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.RedisKeyConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +63,8 @@ public class OrderController {
     private WebSocketServer webSocketServer;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/submit")
     @ApiOperation("订单提交")
@@ -102,6 +106,8 @@ public class OrderController {
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setAddress(addressBook.getProvinceName() + addressBook.getCityName() + addressBook.getDistrictName());
+        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        orders.setShopId(shopId);
 
         //向订单表插入一条数据
         ordersService.save(orders);

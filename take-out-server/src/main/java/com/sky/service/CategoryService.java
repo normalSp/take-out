@@ -54,4 +54,12 @@ public interface CategoryService{
      * @return
      */
     Category getById(Long id);
+
+    /**
+     * 根据id查询分类
+     * @param type
+     * @param shopId
+     * @return
+     */
+    List<Category> list(Integer type, Long shopId);
 }

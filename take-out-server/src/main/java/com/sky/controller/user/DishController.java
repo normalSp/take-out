@@ -1,6 +1,8 @@
 package com.sky.controller.user;
 
+import com.sky.constant.RedisKeyConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.entity.Dish;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -9,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +25,9 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     /**
      * 根据分类id查询菜品
      *
@@ -34,6 +40,9 @@ public class DishController {
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
         dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
+
+        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        dish.setShopId(shopId);
 
         List<DishVO> list = dishService.listWithFlavor(dish);
 

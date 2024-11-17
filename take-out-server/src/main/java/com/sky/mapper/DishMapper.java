@@ -28,24 +28,28 @@ public interface DishMapper extends BaseMapper<Dish> {
     @Select("select * from dish where name like concat('%',#{name},'%') " +
             "and category_id = #{categoryId} " +
             "and status = #{status} " +
+            "and shop_id = #{shopId} " +
             "order by create_time desc")
     List<Dish> list(Dish dish);
 
     @Select("select * from dish where name like concat('%',#{name},'%') " +
             "and category_id like concat('%') " +
             "and status = #{status} " +
+            "and shop_id = #{shopId} " +
             "order by create_time desc")
     List<Dish> listWithoutCategoryId(Dish dish);
 
     @Select("select * from dish where name like concat('%',#{name},'%') " +
             "and category_id = #{categoryId} " +
             "and status like concat('%') " +
+            "and shop_id = #{shopId} " +
             "order by create_time desc")
     List<Dish> listWithoutStatus(Dish dish);
 
     @Select("select * from dish where name like concat('%',#{name},'%') " +
             "and category_id like concat('%') " +
             "and status like concat('%') " +
+            "and shop_id = #{shopId} " +
             "order by create_time desc")
     List<Dish> listWithoutStatusAndCategoryId(Dish dish);
 
