@@ -21,6 +21,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -135,9 +136,14 @@ public class UserController {
      * @return 无
      */
     @PostMapping("/logout")
-    public Result logout(){
-        // TODO 实现登出功能
-        return Result.fail("功能未完成");
+    public Result logout(HttpServletRequest request){
+        //1.获取请求头中的token
+        String token = request.getHeader("authorization");
+
+        //2. 删除reids中的用户
+        stringRedisTemplate.opsForHash().entries("login:token:" + token).clear();
+
+        return Result.ok("登出成功");
     }
 
     @GetMapping("/me")
