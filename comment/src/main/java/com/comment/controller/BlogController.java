@@ -14,6 +14,7 @@ import com.comment.entity.User;
 import com.comment.service.IBlogService;
 import com.comment.service.IFollowService;
 import com.comment.service.IUserService;
+import com.comment.utils.RedisConstants;
 import com.comment.utils.SystemConstants;
 import com.comment.utils.UserHolder;
 import org.springframework.beans.BeanUtils;
@@ -77,7 +78,7 @@ public class BlogController {
 
         //将blog推给所有粉丝
         for(Follow follow : fanList){
-            String key = "feed:" + follow.getUserId();
+            String key = RedisConstants.FEED_KEY + follow.getUserId();
 
             stringRedisTemplate.opsForZSet().add(key, blog.getId().toString(), System.currentTimeMillis());
         }
@@ -257,7 +258,7 @@ public class BlogController {
         Long userId = UserHolder.getUser().getId();
 
         //1. 查询收件箱
-        String key = "feed:" + userId;
+        String key = RedisConstants.FEED_KEY + userId;
         Set<ZSetOperations.TypedTuple<String>> typedTuples = stringRedisTemplate.opsForZSet()
                 .reverseRangeByScoreWithScores(key, 0, max, offset, 2);
 

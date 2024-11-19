@@ -11,6 +11,7 @@ import com.comment.entity.User;
 import com.comment.entity.UserInfo;
 import com.comment.service.IUserInfoService;
 import com.comment.service.IUserService;
+import com.comment.utils.RedisConstants;
 import com.comment.utils.RegexUtils;
 import com.comment.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,7 @@ public class UserController {
 
         //session.setAttribute("code", code);
 
-        stringRedisTemplate.opsForValue().set("login:code:" + phone, code, 3, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(RedisConstants.LOGIN_CODE_KEY + phone, code, 3, TimeUnit.MINUTES);
 
 
         log.info("手机验证码：{}", code);
@@ -88,7 +89,7 @@ public class UserController {
         }
 
         //1. 从redis获取验证码并校验
-        String code = stringRedisTemplate.opsForValue().get("login:code:" + loginForm.getPhone());
+        String code = stringRedisTemplate.opsForValue().get(RedisConstants.LOGIN_CODE_KEY + loginForm.getPhone());
 
         if(code == null || !code.equals(loginForm.getCode())){
             return Result.fail("验证码错误");
@@ -123,9 +124,9 @@ public class UserController {
         userMap.put("id", id);
 
         //4. 存储
-        stringRedisTemplate.opsForHash().putAll("login:token:" + token, userMap);
+        stringRedisTemplate.opsForHash().putAll(RedisConstants.LOGIN_USER_KEY + token, userMap);
         //设置有效期
-        stringRedisTemplate.expire("login:token:" + token, 30, TimeUnit.MINUTES);
+        stringRedisTemplate.expire(RedisConstants.LOGIN_USER_KEY + token, 30, TimeUnit.MINUTES);
 
         //5. 返回token到前端
         return Result.ok(token);
@@ -141,7 +142,7 @@ public class UserController {
         String token = request.getHeader("authorization");
 
         //2. 删除reids中的用户
-        stringRedisTemplate.opsForHash().entries("login:token:" + token).clear();
+        stringRedisTemplate.opsForHash().entries(RedisConstants.LOGIN_USER_KEY + token).clear();
 
         return Result.ok("登出成功");
     }
@@ -195,7 +196,7 @@ public class UserController {
         LocalDateTime now = LocalDateTime.now();
         String yyyyMM = now.format(DateTimeFormatter.ofPattern(":yyyyMM"));
 
-        String key = "sign:" + userId + yyyyMM;
+        String key = RedisConstants.USER_SIGN_KEY + userId + yyyyMM;
 
         int dayOfMonth = now.getDayOfMonth() - 1;
 
@@ -213,7 +214,7 @@ public class UserController {
         LocalDateTime now = LocalDateTime.now();
         String yyyyMM = now.format(DateTimeFormatter.ofPattern(":yyyyMM"));
 
-        String key = "sign:" + userId + yyyyMM;
+        String key = RedisConstants.USER_SIGN_KEY + userId + yyyyMM;
 
         int dayOfMonth = now.getDayOfMonth() - 1;
 

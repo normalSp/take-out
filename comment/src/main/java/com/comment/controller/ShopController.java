@@ -8,10 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.comment.dto.Result;
 import com.comment.entity.Shop;
 import com.comment.service.IShopService;
-import com.comment.utils.CacheClient;
-import com.comment.utils.LockUtils;
-import com.comment.utils.RedisData;
-import com.comment.utils.SystemConstants;
+import com.comment.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.geo.Distance;
@@ -60,7 +57,7 @@ public class ShopController {
 
         //Shop shop = cacheClient.queryObjectWithLogical("shop:", id, Shop.class,shopService::getById, "lock:shop", 30L, TimeUnit.MINUTES);
 
-        Shop shop = cacheClient.queryWithPassThrough("shop:", id, Shop.class, shopService::getById, 30L, TimeUnit.MINUTES);
+        Shop shop = cacheClient.queryWithPassThrough("shop:", id, Shop.class, shopService::getById, RedisConstants.CACHE_SHOP_TTL, TimeUnit.MINUTES);
 
         //Shop shop = queryShopMutex(id);
 
@@ -98,7 +95,7 @@ public class ShopController {
         //3. 缓存重建
         //3.1 获取互斥锁
         LockUtils lockUtils =  new LockUtils(stringRedisTemplate);
-        boolean flag = lockUtils.tryLock("lock:shop" + id);
+        boolean flag = lockUtils.tryLock(RedisConstants.LOCK_SHOP_KEY + id);
 
         //3.2 判断获取是否成功
         if(flag) {
@@ -120,12 +117,12 @@ public class ShopController {
             LockUtils.CACHE_REBUILD_EXECUTOR.submit(() -> {
                 try {
                     //重建缓存
-                    this.saveShopToReids(id, 30L);
+                    this.saveShopToReids(id, RedisConstants.CACHE_SHOP_TTL);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 } finally {
                     //释放锁
-                    lockUtils.unLock("lock:shop" + id);
+                    lockUtils.unLock(RedisConstants.LOCK_SHOP_KEY + id);
                 }
             });
         }
@@ -154,7 +151,7 @@ public class ShopController {
 
             //x.实现缓存重建
             //x.1 获取锁
-            boolean flag = lockUtils.tryLock("lock:shop" + id);
+            boolean flag = lockUtils.tryLock(RedisConstants.LOCK_SHOP_KEY + id);
 
             //x.2 判断是否获取成功
             if(!flag){
@@ -174,12 +171,12 @@ public class ShopController {
                 return null;
             }
 
-            stringRedisTemplate.opsForValue().set("shop:" + id, JSONUtil.toJsonStr(shop), 30L, TimeUnit.MINUTES);
+            stringRedisTemplate.opsForValue().set("shop:" + id, JSONUtil.toJsonStr(shop), RedisConstants.CACHE_SHOP_TTL, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             //x.5 释放锁
-            lockUtils.unLock("lock:shop" + id);
+            lockUtils.unLock(RedisConstants.LOCK_SHOP_KEY + id);
         }
 
 
@@ -245,7 +242,7 @@ public class ShopController {
         //GEOSEARCH key BYLONLAT x y BYRADIUS 5 km WITHDISTANCE
         GeoResults<RedisGeoCommands.GeoLocation<String>> results = stringRedisTemplate.opsForGeo()
                 .search(
-                        "shop:geo:" + typeId,
+                        RedisConstants.SHOP_GEO_KEY + typeId,
                         GeoReference.fromCoordinate(x, y),
                         new Distance(5000),
                         RedisGeoCommands.GeoSearchCommandArgs.newGeoSearchArgs().includeDistance().limit(end)
