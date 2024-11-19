@@ -58,6 +58,6 @@ public interface DishMapper extends BaseMapper<Dish> {
      * @param map
      * @return
      */
-    @Select("select count(id) from dish where status = #{status} AND shop_id = #{shopId}")
+    @Select("select count(id) from dish where status = #{map.status} AND shop_id = #{shopId}")
     Integer countByMap(Map map, Long shopId);
 }

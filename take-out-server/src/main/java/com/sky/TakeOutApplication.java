@@ -14,10 +14,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 @EnableCaching
 @ServletComponentScan //用于扫描过滤器注解
 @EnableSwagger2WebMvc //开启swagger
-public class SkyApplication {
+public class TakeOutApplication {
     public static void main(String[] args) {
-        SpringApplication.run(SkyApplication.class, args);
+        SpringApplication.run(TakeOutApplication.class, args);
         log.info("server started");
-        log.info("毕设？ 启动！");
+        log.info("毕设-外卖系统？ 启动！");
     }
 }

@@ -16,6 +16,8 @@
         <module>take-out-common</module>
         <module>take-out-pojo</module>
         <module>take-out-server</module>
+        <module>comment</module>
+        <module>comment</module>
     </modules>
     <properties>
         <mybatis.spring>2.2.0</mybatis.spring>

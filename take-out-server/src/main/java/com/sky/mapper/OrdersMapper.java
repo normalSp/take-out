@@ -21,10 +21,10 @@ public interface OrdersMapper extends BaseMapper<Orders> {
      * @param map
      * @return
      */
-    @Select("select count(id) from orders where order_time > #{begin} and order_time < #{end} and status = #{status}  AND shop_id = #{shopId}")
+    @Select("select count(id) from orders where order_time > #{map.begin} and order_time < #{map.end} and status = #{map.status}  AND shop_id = #{shopId}")
     Integer countByMap(Map map, Long shopId);
 
-    @Select("select count(id) from orders where order_time > #{begin} and order_time < #{end} AND shop_id = #{shopId}")
+    @Select("select count(id) from orders where order_time > #{map.begin} and order_time < #{map.end} AND shop_id = #{shopId}")
     Integer countByMapWithoutStatus(Map map, Long shopId);
 
     /**
@@ -32,6 +32,6 @@ public interface OrdersMapper extends BaseMapper<Orders> {
      * @param map
      * @return
      */
-    @Select("select sum(amount) from orders where order_time > #{begin} and order_time < #{end} and status = #{status} AND shop_id = #{shopId}")
+    @Select("select sum(amount) from orders where order_time > #{map.begin} and order_time < #{map.end} and status = #{map.status} AND shop_id = #{shopId}")
     Double sumByMap(Map map, Long shopId);
 }

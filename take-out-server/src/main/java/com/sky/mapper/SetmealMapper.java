@@ -53,7 +53,7 @@ public interface SetmealMapper extends BaseMapper<Setmeal> {
      * @param map
      * @return
      */
-    @Select("select count(id) from setmeal where status = #{status} AND shop_id = #{shopId}")
+    @Select("select count(id) from setmeal where status = #{map.status} AND shop_id = #{shopId}")
     Integer countByMap(Map map, Long shopId);
 
 }
