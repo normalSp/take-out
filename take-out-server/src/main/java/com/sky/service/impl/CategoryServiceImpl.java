@@ -55,6 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setUpdateTime(LocalDateTime.now());
         category.setCreateUser(BaseContext.getCurrentId());
         category.setUpdateUser(BaseContext.getCurrentId());
+        category.setShopId(categoryDTO.getShopId());
 
         categoryMapper.insert(category);
     }

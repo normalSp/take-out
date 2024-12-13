@@ -120,4 +120,17 @@ public class CategoryController {
         List<Category> list = categoryService.list(type);
         return Result.success(list);
     }
+
+    /**
+     * 根据id查询分类
+     * @param id
+     * @return
+     */
+    @GetMapping("/select/{id}")
+    @ApiOperation("根据id查询分类")
+    public Result<Category> selectById(@PathVariable Long id){
+        Category category = categoryService.getById(id);
+
+        return Result.success(category);
+    }
 }

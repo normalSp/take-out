@@ -129,6 +129,9 @@ public class SetmealController {
 
         setmealVO.setSetmealDishes(setmealDishes);
 
+        Category category = categoryService.getById(setmeal.getCategoryId());
+        setmealVO.setCategoryName(category.getName());
+
         return Result.success(setmealVO);
     }
 

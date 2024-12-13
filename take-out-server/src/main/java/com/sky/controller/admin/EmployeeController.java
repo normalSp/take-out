@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.constant.MessageConstant;
@@ -206,7 +207,12 @@ public class EmployeeController {
         BeanUtils.copyProperties(employeeDTO, employee);
 
         if(null != employee.getId()){
-            employeeService.updateById(employee);
+            LambdaUpdateWrapper<Employee> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            lambdaUpdateWrapper.eq(Employee::getId, employee.getId());
+            employeeService.update(employee, lambdaUpdateWrapper);
+
+            //employeeService.updateById(employee);
+
             return Result.success(MessageConstant.ACCOUNT_EDIT_SUCCEED);
         }
         return Result.error(MessageConstant.ACCOUNT_NOT_FOUND);
