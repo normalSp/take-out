@@ -83,3 +83,12 @@ sky:
     weChatPayCertFilePath: ${sky.wechat.weChatPayCertFilePath}
     notifyUrl: ${sky.wechat.notifyUrl}
     refundNotifyUrl: ${sky.wechat.refundNotifyUrl}
+
+reggie:
+  # Linux目录 --> /usr/local/WorkSpace/temp/
+  path: /usr/local/WorkSpace/temp/
+  # windows目录 --> D:\WorkSpace\temp\
+  accessKeyId: LTAI5tMHJgr
+  accessKeySecret: Hv0t8CKG2FO
+  accessKeyId_: 6cdhZeC4sW5hU
+  accessKeySecret_: 8IIR28QhHNf0FpusiRg
