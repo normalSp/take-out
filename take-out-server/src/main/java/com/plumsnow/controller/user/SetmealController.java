@@ -47,6 +47,23 @@ public class SetmealController {
     }
 
     /**
+     * 条件查询
+     *
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/listBy2Id")
+    @ApiOperation("根据分类id和商店查询套餐")
+    //@Cacheable(value = "setmeal")
+    public Result<List<Setmeal>> listByCategoryIdAndShopId(Long categoryId, Long shopId) {
+        LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Setmeal::getCategoryId, categoryId);
+        lambdaQueryWrapper.eq(Setmeal::getShopId, shopId);
+
+        return Result.success(setmealService.list(lambdaQueryWrapper));
+    }
+
+    /**
      * 根据套餐id查询包含的菜品列表
      *
      * @param id

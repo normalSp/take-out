@@ -1,5 +1,6 @@
 package com.plumsnow.controller.user;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.plumsnow.constant.RedisKeyConstant;
@@ -142,5 +143,20 @@ public class ShopController {
         shopList.get(0).setTotal(count);
 
         return Result.success(shopList);
+    }
+
+    @GetMapping("/one/{shopId}")
+    @ApiOperation("根据id查询商铺信息")
+    public Result<Shop> queryShopByType(@PathVariable String shopId){
+        LambdaQueryWrapper<Shop> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Shop::getId, shopId);
+
+        Shop one = shopService.getOne(lambdaQueryWrapper);
+
+        if(one == null){
+            return Result.error("没有找到该商店");
+        }
+
+        return Result.success(one);
     }
 }

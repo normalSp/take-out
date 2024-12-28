@@ -49,4 +49,25 @@ public class DishController {
         return Result.success(list);
     }
 
+    /**
+     * 根据分类id和商店id查询菜品
+     *
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/listBy2Id")
+    @ApiOperation("根据分类id查询菜品")
+    public Result<List<DishVO>> listBy2Id(Long categoryId, Long shopId) {
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+        dish.setStatus(StatusConstant.ENABLE);//查询起售中的菜品
+
+        //long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        dish.setShopId(shopId);
+
+        List<DishVO> list = dishService.listWithFlavor(dish);
+
+        return Result.success(list);
+    }
+
 }

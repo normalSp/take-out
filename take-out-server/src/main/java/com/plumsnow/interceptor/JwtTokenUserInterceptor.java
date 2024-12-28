@@ -42,7 +42,9 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
 
         //1、从请求头中获取令牌
         //token和adm什么的搞反了
+        //这个给微信用
         //String token = request.getHeader(jwtProperties.getUserTokenName());
+        //这个给网页用
         String token = request.getHeader(jwtProperties.getAdminTokenName());
 
         //2、校验令牌

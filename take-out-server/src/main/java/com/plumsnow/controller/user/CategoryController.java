@@ -40,4 +40,18 @@ public class CategoryController {
 
         return Result.success(list);
     }
+
+    /**
+     * 附加shopId查询分类
+     * @param type
+     * @return
+     */
+    @GetMapping("/listByShopId")
+    @ApiOperation("查询分类")
+    @Cacheable(value = "category")
+    public Result<List<Category>> listByShopId(Integer type, Long shopId) {
+        List<Category> list = categoryService.list(type, shopId);
+
+        return Result.success(list);
+    }
 }
