@@ -1,5 +1,6 @@
 package com.plumsnow.controller.user;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.plumsnow.constant.RedisKeyConstant;
 import com.plumsnow.context.BaseContext;
 import com.plumsnow.entity.Category;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
@@ -53,5 +55,18 @@ public class CategoryController {
         List<Category> list = categoryService.list(type, shopId);
 
         return Result.success(list);
+    }
+
+    /**
+     * 根据id查询分类
+     * @param id
+     * @return
+     */
+    @GetMapping("/getById/{id}")
+    @ApiOperation("根据id查询分类")
+    public Result<Category> getById(@PathVariable Long id) {
+        Category category = categoryService.getById(id);
+
+        return Result.success(category);
     }
 }

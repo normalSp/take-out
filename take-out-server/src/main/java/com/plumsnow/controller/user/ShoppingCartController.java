@@ -10,6 +10,7 @@ import com.plumsnow.result.Result;
 import com.plumsnow.service.DishService;
 import com.plumsnow.service.SetmealService;
 import com.plumsnow.service.ShoppingCartService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -48,8 +49,13 @@ public class ShoppingCartController {
         shoppingCart.setUserId(BaseContext.getCurrentId());
 
         //1.1 设置商家id
-        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
-        shoppingCart.setShopId(shopId);
+        long shopId;
+        if(shoppingCart.getShopId() != null){
+            shopId = shoppingCart.getShopId();
+        }else {
+            shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+            shoppingCart.setShopId(shopId);
+        }
 
         //2. 查询当前菜品或套餐是否在购物车中
         LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -122,12 +128,20 @@ public class ShoppingCartController {
         LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
 
-        long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        //设置商家id
+        long shopId;
+        if(shoppingCart.getShopId() != null){
+            shopId = shoppingCart.getShopId();
+        }else {
+            shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+            shoppingCart.setShopId(shopId);
+        }
         lambdaQueryWrapper.eq(ShoppingCart::getShopId, shopId);
 
         if(null != shoppingCart.getDishId()){
             lambdaQueryWrapper.eq(ShoppingCart::getDishId, shoppingCart.getDishId());
         }
+
         else{
             lambdaQueryWrapper.eq(ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
         }
@@ -169,17 +183,54 @@ public class ShoppingCartController {
         return Result.success(shoppingCarts);
     }
 
+    /**
+     * 根据shopId查看购物车
+     * @return
+     */
+    @GetMapping("/list/{shopId}")
+    public Result<List<ShoppingCart>> listByShopId(@PathVariable Long shopId){
+        log.info("查看商店id为{}购物车...", shopId);
+
+        LambdaQueryWrapper<ShoppingCart>  lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
+
+        lambdaQueryWrapper.eq(ShoppingCart::getShopId, shopId);
+        lambdaQueryWrapper.orderByDesc(ShoppingCart::getCreateTime);
+
+        List<ShoppingCart> shoppingCarts = shoppingCartService.list(lambdaQueryWrapper);
+
+        return Result.success(shoppingCarts);
+    }
+
 
     /**
      * 清空购物车
      * @return
      */
     @DeleteMapping("/clean")
+    @ApiOperation("清空购物车")
     public Result<String> clean(){
         LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
 
         long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
+        lambdaQueryWrapper.eq(ShoppingCart::getShopId, shopId);
+
+        shoppingCartService.remove(lambdaQueryWrapper);
+
+        return Result.success("清空购物车成功");
+    }
+
+    /**
+     * 根据商店id清空购物车
+     * @return
+     */
+    @DeleteMapping("/clean/{shopId}")
+    @ApiOperation("根据商店id清空购物车")
+    public Result<String> cleanByShopId(@PathVariable Long shopId){
+        LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ShoppingCart::getUserId, BaseContext.getCurrentId());
+
         lambdaQueryWrapper.eq(ShoppingCart::getShopId, shopId);
 
         shoppingCartService.remove(lambdaQueryWrapper);
