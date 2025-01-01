@@ -10,6 +10,7 @@ public class MessageConstant {
     public static final String UPDATE_SUCCESS = "更新成功";
     public static final String DISH_NOT_EXIST = "菜品不存在";
     public static final String DELETE_SUCCESS = "删除成功";
+    public static final String DELETE_FAILURE = "删除失败";
     public static final String SAVE_SUCCESS = "保存成功";
     public static final String SAVE_FAILURE = "保存失败";
     public static final String PASSWORD_ERROR = "密码错误";

@@ -173,6 +173,9 @@ public class UserController {
                     .token(token)
                     .build();
 
+            //删除redis中的验证码
+            stringRedisTemplate.delete(phoneNumber);
+
             return Result.success(userLoginVO);
         }
 
