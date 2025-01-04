@@ -335,7 +335,10 @@ public class ReportController {
                 row.getCell(5).setCellValue(businessData.getUnitPrice());
                 row.getCell(6).setCellValue(businessData.getNewUsers());
             }
-            
+
+            httpServletResponse.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            httpServletResponse.setHeader("Content-Disposition", "attachment; filename=OperationalDataReport.xlsx");
+
             //3.通过输出流将Excel下载到前端
             ServletOutputStream out = httpServletResponse.getOutputStream();
             excel.write(out);
