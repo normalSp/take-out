@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -33,6 +34,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
+@Controller("adminVoucherController")
 @RequestMapping("/admin/voucher")
 @Api(tags = "优惠卷管理相关接口")
 public class VoucherController {
@@ -186,7 +188,13 @@ public class VoucherController {
         return Result.success(voucher.getId());
     }
 
+    /**
+     * 删除优惠券
+     * @param voucherId
+     * @return
+     */
     @DeleteMapping("/delete/{voucherId}")
+    @ApiOperation("删除优惠券")
     public Result deleteVoucher(@PathVariable Long voucherId) {
         Voucher voucher = voucherService.getById(voucherId);
         if(voucher.getType() == 0){

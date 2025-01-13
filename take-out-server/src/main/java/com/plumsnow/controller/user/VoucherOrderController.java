@@ -5,12 +5,12 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import com.plumsnow.context.BaseContext;
+import com.plumsnow.entity.Voucher;
 import com.plumsnow.entity.VoucherOrder;
 import com.plumsnow.service.ISeckillVoucherService;
 import com.plumsnow.service.IVoucherOrderService;
 import com.plumsnow.service.IVoucherService;
 import com.plumsnow.utils.RedisIdWorker;
-import com.plumsnow.utils.UserHolder;
 import com.plumsnow.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,7 +49,7 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/voucher-order")
+@RequestMapping("/user/voucher-order")
 @Api(tags = "C端-用户抢卷相关接口")
 public class VoucherOrderController {
 
@@ -57,7 +57,7 @@ public class VoucherOrderController {
     private IVoucherService iVoucherService;
 
     @Autowired
-    private ISeckillVoucherService iSeckillVoucherService;
+    private ISeckillVoucherService SeckillVoucherService;
 
     @Autowired
     private RedisIdWorker redisIdWorker;
@@ -114,7 +114,7 @@ public class VoucherOrderController {
                 } catch (Exception e) {
                     log.info("处理订单异常：{}", e.getMessage());
 
-                    //handlePendingList();
+                    handlePendingList();
                 }
 
             }
@@ -167,6 +167,31 @@ public class VoucherOrderController {
     @PostMapping("seckill/{id}")
     @ApiOperation("秒杀抢卷")
     public Result seckillVoucher(@PathVariable("id") Long voucherId) {
+        //判断是不是秒杀卷
+        Voucher voucher = iVoucherService.getById(voucherId);
+        if(voucher.getType() != 1){
+            Long userId = BaseContext.getCurrentId();
+            //一人一单
+            LambdaQueryWrapper<VoucherOrder> lambdaQueryWrapper1 = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper1.eq(VoucherOrder::getUserId, userId);
+            lambdaQueryWrapper1.eq(VoucherOrder::getVoucherId, voucherId);
+            List<VoucherOrder> voucherOrders = voucherOrderService.list(lambdaQueryWrapper1);
+            if (!voucherOrders.isEmpty()) {
+                log.info("用户已经下过单了");
+                return Result.error("不可重复下单");
+            }
+
+            VoucherOrder voucherOrder = new VoucherOrder();
+            long orderId = redisIdWorker.getId("voucher_order");
+            voucherOrder.setId(orderId);
+            voucherOrder.setVoucherId(voucherId);
+            voucherOrder.setUserId(userId);
+            voucherOrderService.save(voucherOrder);
+
+            //3. 返回订单id
+            return Result.success(orderId);
+        }
+
         //在主线程拿到代理对象
         proxy = (VoucherOrderController) AopContext.currentProxy();
 
@@ -208,7 +233,7 @@ public class VoucherOrderController {
 
 
             // 扣库存
-            boolean b = iSeckillVoucherService.update()
+            boolean b = SeckillVoucherService.update()
                     .setSql("stock = stock - 1")
                     .eq("voucher_id", voucherId)
                     .gt("stock", 0)

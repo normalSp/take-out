@@ -33,6 +33,12 @@ public class ShopController {
     @ApiOperation("获取店铺状态")
     public Result<Integer> getStatus(){
         Integer shopStatus = (Integer) redisTemplate.opsForValue().get(BaseContext.getCurrentShopId() + "SHOP_STATUS");
+        //如果shopStatus为空，在redis新增
+        if(null == shopStatus){
+            redisTemplate.opsForValue().set(BaseContext.getCurrentShopId() + "SHOP_STATUS", 1);
+            shopStatus = 1;
+        }
+
         log.info("获取店铺状态:{}", shopStatus == 1 ? "营业中" : "打样中");
 
         return Result.success(shopStatus);
