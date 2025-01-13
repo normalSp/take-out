@@ -34,7 +34,7 @@ public class CategoryController {
      */
     @GetMapping("/list")
     @ApiOperation("查询分类")
-    @Cacheable(value = "category")
+    //@Cacheable(value = "category")
     public Result<List<Category>> list(Integer type) {
         long shopId = RedisKeyConstant.getShopId(stringRedisTemplate, BaseContext.getCurrentId());
 
@@ -50,7 +50,7 @@ public class CategoryController {
      */
     @GetMapping("/listByShopId")
     @ApiOperation("查询分类")
-    @Cacheable(value = "category")
+    //@Cacheable(value = "category")
     public Result<List<Category>> listByShopId(Integer type, Long shopId) {
         List<Category> list = categoryService.list(type, shopId);
 

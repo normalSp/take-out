@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 
@@ -12,6 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 @EnableTransactionManagement //开启注解方式的事务管理
 @Slf4j
 @EnableCaching
+@EnableAspectJAutoProxy(exposeProxy = true)
 @ServletComponentScan //用于扫描过滤器注解
 @EnableSwagger2WebMvc //开启swagger
 public class TakeOutApplication {
