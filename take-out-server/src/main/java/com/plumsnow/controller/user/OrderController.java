@@ -16,10 +16,7 @@ import com.plumsnow.exception.OrderBusinessException;
 import com.plumsnow.exception.ShoppingCartBusinessException;
 import com.plumsnow.result.PageResult;
 import com.plumsnow.result.Result;
-import com.plumsnow.service.AddressBookService;
-import com.plumsnow.service.OrdersService;
-import com.plumsnow.service.ShoppingCartService;
-import com.plumsnow.service.UserService;
+import com.plumsnow.service.*;
 import com.plumsnow.service.impl.OrderDetailService;
 import com.plumsnow.utils.WeChatPayUtil;
 import com.plumsnow.vo.OrderPaymentVO;
@@ -64,6 +61,8 @@ public class OrderController {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private IVoucherOrderService voucherOrderService;
 
     @PostMapping("/submit")
     @ApiOperation("订单提交")
@@ -135,10 +134,10 @@ public class OrderController {
         return Result.success(orderSubmitVO);
     }
 
-    @PostMapping("/submitByShopId")
+    @PostMapping("/submitByShopId/{voucherId}")
     @ApiOperation("订单提交-附加shopId")
     @Transactional
-    public Result<OrderSubmitVO> submitByShopId(@RequestBody OrdersSubmitDTO ordersSubmitDTO){
+    public Result<OrderSubmitVO> submitByShopId(@RequestBody OrdersSubmitDTO ordersSubmitDTO, @PathVariable Long voucherId){
         log.info("订单提交信息:{}",ordersSubmitDTO);
 
         //处理业务异常（地址为空）
@@ -194,6 +193,15 @@ public class OrderController {
 
         //清空购物车
         shoppingCartService.remove(lamdaQueryWrapper4ShoppingCart);
+
+        //判断有无使用优惠卷
+        if(voucherId != null){
+            LambdaUpdateWrapper<VoucherOrder> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            lambdaUpdateWrapper.eq(VoucherOrder::getVoucherId, voucherId);
+            lambdaUpdateWrapper.set(VoucherOrder::getStatus, 2);
+
+            voucherOrderService.update(lambdaUpdateWrapper);
+        }
 
         //创建VO对象并返回前端
         OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()

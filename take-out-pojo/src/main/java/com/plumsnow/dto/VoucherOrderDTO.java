@@ -6,6 +6,10 @@ import java.io.Serializable;
 
 @Data
 public class VoucherOrderDTO implements Serializable {
+    /**
+     * 优惠卷id
+     */
+    private Long voucherId;
 
     /**
      * 商铺id

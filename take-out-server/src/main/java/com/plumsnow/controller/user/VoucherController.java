@@ -120,7 +120,7 @@ public class VoucherController {
      * @param shopId
      * @return 优惠券信息
      */
-    @GetMapping("/voucher/order/list/{shopId}")
+    @GetMapping("/order/list/{shopId}")
     @ApiOperation("根据userId查询用户下单的优惠券")
     public Result<List<VoucherOrderDTO>> queryMyVoucher(@PathVariable Long shopId) {
         LambdaQueryWrapper<VoucherOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -149,6 +149,7 @@ public class VoucherController {
             voucherOrderDTO.setTitle(voucher.getTitle());
             voucherOrderDTO.setSubTitle(voucher.getSubTitle());
             voucherOrderDTO.setRules(voucher.getRules());
+            voucherOrderDTO.setVoucherId(voucherOrder.getVoucherId());
             voucherOrderDTOList.add(voucherOrderDTO);
         }
 
