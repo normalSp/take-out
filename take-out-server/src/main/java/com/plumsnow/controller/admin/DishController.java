@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +51,7 @@ public class DishController {
     @PostMapping()
     @ApiOperation("菜品保存")
     @Transactional
-    @CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' +#dishDTO.status")
+    //@CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' +#dishDTO.status")
     public Result<String> save(@RequestBody  DishDTO dishDTO){
         log.info("菜品保存信息：{}", dishDTO);
 
@@ -117,7 +118,7 @@ public class DishController {
     @DeleteMapping()
     @Transactional
     @ApiOperation("删除菜品")
-    @CacheEvict(value = "dish", allEntries = true)
+    //@CacheEvict(value = "dish", allEntries = true)
     public Result<String> deletes(Long[] ids){
         log.info("调用删除菜品方法，传入的菜品id --> ids:{}", ids);
 
@@ -148,7 +149,7 @@ public class DishController {
     
     @PostMapping("/status/{status}")
     @ApiOperation("菜品启售或禁售")
-    @CacheEvict(value = "dish", allEntries = true)
+    //@CacheEvict(value = "dish", allEntries = true)
     public Result<String> forbidOrEnable(@PathVariable Integer status, Long id){
         log.info("调用菜品启售或禁售方法，传入的菜品id --> id:{}, 状态 --> status:{}", id, status);
 
@@ -194,7 +195,7 @@ public class DishController {
     @PutMapping()
     @ApiOperation("修改菜品")
     @Transactional
-    @CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' +#dishDTO.status")
+    //@CacheEvict(value = "dish", key = "#dishDTO.categoryId + '_' +#dishDTO.status")
     public Result<String> update(@RequestBody DishDTO dishDTO){
         List<DishFlavor> dishFlavorList = dishDTO.getFlavors();
 
@@ -220,7 +221,7 @@ public class DishController {
 
     @GetMapping ("/list")
     @ApiOperation("根据分类id查询菜品")
-    @CacheEvict(value = "dish", key = "#categoryId + '_' + 1")
+    //@CacheEvict(value = "dish", key = "#categoryId + '_' + 1")
     public Result<List<Dish>> getByCategoryId(Long categoryId){
         LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Dish::getCategoryId, categoryId);

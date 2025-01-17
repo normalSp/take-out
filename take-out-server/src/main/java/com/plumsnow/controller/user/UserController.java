@@ -1,11 +1,13 @@
 package com.plumsnow.controller.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.plumsnow.constant.JwtClaimsConstant;
 import com.plumsnow.constant.MessageConstant;
 import com.plumsnow.constant.RedisKeyConstant;
 import com.plumsnow.context.BaseContext;
 import com.plumsnow.dto.DishDTO;
+import com.plumsnow.dto.UserDTO;
 import com.plumsnow.dto.UserLoginDTO;
 import com.plumsnow.entity.User;
 import com.plumsnow.exception.CustomException;
@@ -22,10 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -181,5 +180,25 @@ public class UserController {
 
         //5.验证码错误
         throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
+    }
+
+    @PostMapping("/editAvatar")
+    @ApiOperation("用户修改头像")
+    public Result editAvatar(@RequestBody UserDTO userDTO) {
+        LambdaUpdateWrapper<User> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        lambdaUpdateWrapper.eq(User::getId, BaseContext.getCurrentId());
+
+        User user = new User();
+        user.setAvatar(userDTO.getAvatar());
+
+        userService.update(user, lambdaUpdateWrapper);
+
+        return Result.success(MessageConstant.UPDATE_SUCCESS);
+    }
+
+    @GetMapping("/getUserInfo")
+    @ApiOperation("获取用户信息")
+    public Result<User> getUserInfo(){
+        return Result.success(userService.getById(BaseContext.getCurrentId()));
     }
 }

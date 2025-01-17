@@ -2,9 +2,11 @@ package com.plumsnow.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class UserDTO {
+public class UserDTO implements Serializable {
     private Long id;
-    private String nickName;
-    private String icon;
+    private String name;
+    private String avatar;
 }

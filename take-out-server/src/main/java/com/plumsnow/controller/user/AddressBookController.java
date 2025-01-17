@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.plumsnow.constant.MessageConstant;
 import com.plumsnow.entity.AddressBook;
 import com.plumsnow.result.Result;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/user/addressBook")
+@Api(tags = "C端-地址相关接口")
 public class AddressBookController {
 
     @Autowired

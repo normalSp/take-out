@@ -83,7 +83,7 @@ public class ReportController {
             BigDecimal turnover = new BigDecimal(0);
 
             for(Orders orders : ordersList){
-                if (Objects.equals(orders.getStatus(), Orders.COMPLETED)) {
+                if (Objects.equals(orders.getStatus(), Orders.DELIVERY_IN_PROGRESS)) {
                     if (orders.getOrderTime().isAfter(localDateTimeMin) && orders.getOrderTime().isBefore(localDateTimeMax)) {
                         turnover = turnover.add(orders.getAmount());
                     }
@@ -176,7 +176,7 @@ public class ReportController {
 
             for(Orders orders : ordersList){
                 if(orders.getOrderTime().isAfter(LocalDateTime.of(date, LocalTime.MIN)) && orders.getOrderTime().isBefore(LocalDateTime.of(date, LocalTime.MAX))) {
-                    if (Objects.equals(orders.getStatus(), Orders.COMPLETED)) {
+                    if (Objects.equals(orders.getStatus(), Orders.DELIVERY_IN_PROGRESS)) {
                         orderEffectiveCount++;
                     }
                     orderTotalCount++;
@@ -238,7 +238,7 @@ public class ReportController {
         Map<String, Integer> map = new HashMap<>();
 
         for(Orders orders : ordersList){
-            if(Objects.equals(orders.getStatus(), Orders.COMPLETED)){
+            if(Objects.equals(orders.getStatus(), Orders.DELIVERY_IN_PROGRESS)){
                 LambdaQueryWrapper<OrderDetail> lamdaQueryWrapper4OrderDetail = new LambdaQueryWrapper<>();
                 lamdaQueryWrapper4OrderDetail.eq(OrderDetail::getShopId, BaseContext.getCurrentShopId());
                 lamdaQueryWrapper4OrderDetail.eq(OrderDetail::getOrderId, orders.getId());

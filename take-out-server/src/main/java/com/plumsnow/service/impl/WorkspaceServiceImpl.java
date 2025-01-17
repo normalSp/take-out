@@ -55,7 +55,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         //查询总订单数
         Integer totalOrderCount = orderMapper.countByMapWithoutStatus(map, BaseContext.getCurrentShopId());
 
-        map.put("status", Orders.COMPLETED);
+        map.put("status", Orders.DELIVERY_IN_PROGRESS);
         //营业额
         Double turnover = orderMapper.sumByMap(map, BaseContext.getCurrentShopId());
         turnover = turnover == null? 0.0 : turnover;

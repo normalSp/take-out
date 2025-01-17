@@ -1,4 +1,4 @@
-package com.plumsnow.controller.admin;
+package com.plumsnow.controller.user;
 
 import com.plumsnow.constant.MessageConstant;
 import com.plumsnow.result.Result;
@@ -17,10 +17,10 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Slf4j
-@Api(tags = "管理端通用接口")
-@Controller("adminCommonController")
+@Api(tags = "用户端通用接口")
+@Controller("userCommonController")
 @RestController
-@RequestMapping("/admin/common")
+@RequestMapping("/user/common")
 public class CommonController {
 
     @Autowired
