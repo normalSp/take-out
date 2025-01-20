@@ -298,7 +298,7 @@ public class ReportController {
 
         //2. 封装数据进Excel
         //获取项目的类加载器，然后使用类加载器从项目的资源文件中读取一个 Excel 模板文件
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/OperationalDataReportTemplate.xlsx");
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/Template.xlsx");
         try {
             //基于模板文件创建一个新的Excel文件
             XSSFWorkbook excel = new XSSFWorkbook(in);
@@ -313,7 +313,7 @@ public class ReportController {
             XSSFRow row = sheet1.getRow(3);
             row.getCell(2).setCellValue(businessDataVO.getTurnover());
             row.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
-            row.getCell(6).setCellValue(businessDataVO.getNewUsers());
+            //row.getCell(6).setCellValue(businessDataVO.getNewUsers());
 
             //获得第5行
             row = sheet1.getRow(4);
@@ -333,7 +333,7 @@ public class ReportController {
                 row.getCell(3).setCellValue(businessData.getValidOrderCount());
                 row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
                 row.getCell(5).setCellValue(businessData.getUnitPrice());
-                row.getCell(6).setCellValue(businessData.getNewUsers());
+                //row.getCell(6).setCellValue(businessData.getNewUsers());
             }
 
             httpServletResponse.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

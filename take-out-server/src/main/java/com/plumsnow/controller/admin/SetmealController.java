@@ -82,7 +82,7 @@ public class SetmealController {
     
     @PostMapping
     @Transactional
-    @CacheEvict(value = "setmeal",allEntries = true)
+    //@CacheEvict(value = "setmeal",allEntries = true)
     @ApiOperation("新增套餐")
     public Result<String> save(@RequestBody SetmealDTO setmealDTO){
         Setmeal setmeal = new Setmeal();
@@ -136,7 +136,7 @@ public class SetmealController {
 
     @PutMapping
     @Transactional
-    @CacheEvict(value = "setmeal",allEntries = true)
+    //@CacheEvict(value = "setmeal",allEntries = true)
     @ApiOperation("修改套餐")
     public Result<String> update(@RequestBody SetmealDTO setmealDTO){
         Setmeal setmeal = new Setmeal();
@@ -162,7 +162,7 @@ public class SetmealController {
 
     @DeleteMapping()
     @Transactional
-    @CacheEvict(value = "setmeal",allEntries = true)
+    //@CacheEvict(value = "setmeal",allEntries = true)
     @ApiOperation("删除套餐")
     public Result<String> deletes(Long[] ids){
         setmealService.removeByIds(Arrays.asList(ids));
@@ -178,7 +178,7 @@ public class SetmealController {
 
     @PostMapping("/status/{status}")
     @ApiOperation("启用或禁用套餐")
-    @CacheEvict(value = "setmeal",allEntries = true)
+    //@CacheEvict(value = "setmeal",allEntries = true)
     public Result<String> forbidOrEnable(@PathVariable Integer status, Long id){
         LambdaQueryWrapper<Setmeal> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Setmeal::getId,id);

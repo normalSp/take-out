@@ -137,8 +137,19 @@ public class OrderController {
     @PostMapping("/submitByShopId/{voucherId}")
     @ApiOperation("订单提交-附加shopId")
     @Transactional
-    public Result<OrderSubmitVO> submitByShopId(@RequestBody OrdersSubmitDTO ordersSubmitDTO, @PathVariable Long voucherId){
+    public Result<OrderSubmitVO> submitByShopId(@RequestBody OrdersSubmitDTO ordersSubmitDTO, @PathVariable(required = false) String voucherId){
         log.info("订单提交信息:{}",ordersSubmitDTO);
+
+        // 处理 voucherId，检查是否为 "null" 或者为空字符串
+        Long voucherIdLong = null;
+        if (voucherId != null && !voucherId.equals("null") && !voucherId.isEmpty()) {
+            try {
+                voucherIdLong = Long.valueOf(voucherId);
+            } catch (NumberFormatException e) {
+                // 处理无法转换为 Long 的情况
+                return Result.error("Invalid voucher ID format");
+            }
+        }
 
         //处理业务异常（地址为空）
         LambdaQueryWrapper<AddressBook> lambdaQueryWrapper4AddressBook = new LambdaQueryWrapper<>();
@@ -195,9 +206,9 @@ public class OrderController {
         shoppingCartService.remove(lamdaQueryWrapper4ShoppingCart);
 
         //判断有无使用优惠卷
-        if(voucherId != null){
+        if(voucherIdLong != null){
             LambdaUpdateWrapper<VoucherOrder> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-            lambdaUpdateWrapper.eq(VoucherOrder::getVoucherId, voucherId);
+            lambdaUpdateWrapper.eq(VoucherOrder::getVoucherId, voucherIdLong);
             lambdaUpdateWrapper.set(VoucherOrder::getStatus, 2);
 
             voucherOrderService.update(lambdaUpdateWrapper);

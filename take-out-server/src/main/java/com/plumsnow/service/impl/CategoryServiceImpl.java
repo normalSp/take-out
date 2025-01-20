@@ -116,7 +116,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setUpdateUser(BaseContext.getCurrentId());
 
         Category oldCategory = categoryMapper.selectById(category.getId());
-        category.setType(oldCategory.getType());
+        category.setType(categoryDTO.getType());
         category.setStatus(oldCategory.getStatus());
 
         log.info("修改分类数据：{}",category);

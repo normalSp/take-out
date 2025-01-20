@@ -86,7 +86,7 @@ public class AddressBookController {
         AddressBook addressBook = addressBookService.getOne(queryWrapper);
 
         if (null == addressBook) {
-            return Result.error("没有找到该对象");
+            return Result.error(MessageConstant.DEFAULT_ADDRESS_NOT_FOUND);
         } else {
             return Result.success(addressBook);
         }

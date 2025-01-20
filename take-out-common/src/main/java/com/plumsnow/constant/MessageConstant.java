@@ -37,4 +37,5 @@ public class MessageConstant {
     public static final String ORDER_NOT_FOUND = "订单不存在";
     public static final String UNKNOWN_SHOPID = "未知的商店id";
     public static final String MISSING_ATTRIBUTE = "缺少必要的参数";
+    public static final String DEFAULT_ADDRESS_NOT_FOUND = "请先选择默认地址";
 }

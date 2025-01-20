@@ -21,6 +21,7 @@ import com.plumsnow.result.Result;
 import com.plumsnow.service.EmployeeService;
 import com.plumsnow.utils.JwtUtil;
 import com.plumsnow.vo.EmployeeLoginVO;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -40,6 +41,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/admin/employee")
 @Slf4j
+@Api(tags = "后台员工管理")
 public class EmployeeController {
 
     @Autowired
@@ -54,6 +56,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/login")
+    @ApiOperation("员工登录")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
 
@@ -82,6 +85,7 @@ public class EmployeeController {
      *
      * @return
      */
+    @ApiOperation("员工登出")
     @PostMapping("/logout")
     public Result<String> logout() {
         return Result.success();
@@ -93,7 +97,7 @@ public class EmployeeController {
      */
     @ApiOperation("新增员工")
     @PostMapping
-    @CacheEvict(value = "employee", allEntries = true)
+    //@CacheEvict(value = "employee", allEntries = true)
     public Result<String> save(@RequestBody EmployeeDTO employeeDTO) {
         log.info("新增员工：{}", employeeDTO);
 
@@ -146,7 +150,7 @@ public class EmployeeController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation("禁用/启用账号")
-    @CacheEvict(value = "employee", allEntries = true)
+    //@CacheEvict(value = "employee", allEntries = true)
     public Result<String> forbidOrEnable(@PathVariable Integer status,Long id){
         log.info("账号状态：{}", status);
         log.info("账号id：{}", id);
@@ -195,7 +199,7 @@ public class EmployeeController {
      */
     @PutMapping
     @ApiOperation("修改员工信息")
-    @CacheEvict(value = "employee", allEntries = true)
+    //@CacheEvict(value = "employee", allEntries = true)
     public Result<String> update(@RequestBody EmployeeDTO employeeDTO) {
         log.info("修改员工信息：{}", employeeDTO);
 
@@ -205,6 +209,7 @@ public class EmployeeController {
         if(null != employee.getId()){
             LambdaUpdateWrapper<Employee> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
             lambdaUpdateWrapper.eq(Employee::getId, employee.getId());
+            lambdaUpdateWrapper.eq(Employee::getShopId, BaseContext.getCurrentShopId());
             employeeService.update(employee, lambdaUpdateWrapper);
 
             //employeeService.updateById(employee);

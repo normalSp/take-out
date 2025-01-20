@@ -129,12 +129,16 @@ public class VoucherController {
         lambdaQueryWrapper.orderByDesc(VoucherOrder::getUpdateTime);
         List<VoucherOrder> voucherOrderList = voucherOrderService.list(lambdaQueryWrapper);
 
+        List<VoucherOrder> voucherOrderListToRemove = new ArrayList<>();
+
         for(VoucherOrder voucherOrder : voucherOrderList){
             Voucher voucher = voucherService.getById(voucherOrder.getVoucherId());
             if(!Objects.equals(voucher.getShopId(), shopId)){
-                voucherOrderList.remove(voucherOrder);
+                //voucherOrderList.remove(voucherOrder);
+                voucherOrderListToRemove.add(voucherOrder);
             }
         }
+        voucherOrderList.removeAll(voucherOrderListToRemove);
 
         List<VoucherOrderDTO> voucherOrderDTOList = new ArrayList<>();
 
