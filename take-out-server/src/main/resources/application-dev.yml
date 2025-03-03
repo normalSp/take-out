@@ -47,3 +47,4 @@ spring:
   cache:
     redis:
       time-to-live: 1800000 #设置缓存时间为1800s--30min
+

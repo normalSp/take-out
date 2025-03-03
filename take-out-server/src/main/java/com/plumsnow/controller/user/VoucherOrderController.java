@@ -160,6 +160,7 @@ public class VoucherOrderController {
     static {
         SECKILL_LUA_SCRIPT = new DefaultRedisScript<>();
         SECKILL_LUA_SCRIPT.setLocation(new ClassPathResource("seckill.lua"));
+        //SECKILL_LUA_SCRIPT.setLocation(new ClassPathResource("seckill_test.lua"));
         SECKILL_LUA_SCRIPT.setResultType(Long.class);
     }
 
@@ -223,6 +224,7 @@ public class VoucherOrderController {
             //一人一单
             LambdaQueryWrapper<VoucherOrder> lambdaQueryWrapper1 = new LambdaQueryWrapper<>();
             lambdaQueryWrapper1.eq(VoucherOrder::getUserId, userId);
+            lambdaQueryWrapper1.eq(VoucherOrder::getVoucherId, voucherId);
 
             List<VoucherOrder> voucherOrders = voucherOrderService.list(lambdaQueryWrapper1);
 
