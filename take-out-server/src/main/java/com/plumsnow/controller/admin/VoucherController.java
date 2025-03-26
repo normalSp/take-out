@@ -11,8 +11,8 @@ import com.plumsnow.entity.SeckillVoucher;
 import com.plumsnow.result.PageResult;
 import com.plumsnow.result.Result;
 import com.plumsnow.entity.Voucher;
-import com.plumsnow.service.ISeckillVoucherService;
-import com.plumsnow.service.IVoucherService;
+import com.plumsnow.service.SeckillVoucherService;
+import com.plumsnow.service.VoucherService;
 import com.plumsnow.utils.RedisConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,10 +40,10 @@ import javax.annotation.Resource;
 public class VoucherController {
 
     @Autowired
-    private ISeckillVoucherService seckillVoucherService;
+    private SeckillVoucherService seckillVoucherService;
 
     @Resource
-    private IVoucherService voucherService;
+    private VoucherService voucherService;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;

@@ -12,7 +12,7 @@ import com.plumsnow.entity.Voucher;
  * @author plumsnow
  * @since 2024
  */
-public interface IVoucherService extends IService<Voucher> {
+public interface VoucherService extends IService<Voucher> {
 
     Result queryVoucherOfShop(Long shopId);
 

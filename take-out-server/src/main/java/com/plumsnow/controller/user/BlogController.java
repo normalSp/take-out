@@ -14,8 +14,8 @@ import com.plumsnow.dto.UserDTO;
 import com.plumsnow.entity.Blog;
 import com.plumsnow.entity.Follow;
 import com.plumsnow.entity.User;
-import com.plumsnow.service.IBlogService;
-import com.plumsnow.service.IFollowService;
+import com.plumsnow.service.BlogService;
+import com.plumsnow.service.FollowService;
 import com.plumsnow.service.UserService;
 import com.plumsnow.utils.RedisConstants;
 import com.plumsnow.utils.SystemConstants;
@@ -53,13 +53,13 @@ public class BlogController {
     private static final String LIKE_KEY = "blog:like:";
 
     @Resource
-    private IBlogService blogService;
+    private BlogService blogService;
     @Resource
     private UserService userService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
-    private IFollowService followService;
+    private FollowService followService;
 
     @PostMapping("/add")
     @ApiOperation("新增blog")

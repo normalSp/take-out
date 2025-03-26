@@ -5,8 +5,8 @@ import com.plumsnow.result.Result;
 import com.plumsnow.entity.SeckillVoucher;
 import com.plumsnow.entity.Voucher;
 import com.plumsnow.mapper.VoucherMapper;
-import com.plumsnow.service.ISeckillVoucherService;
-import com.plumsnow.service.IVoucherService;
+import com.plumsnow.service.SeckillVoucherService;
+import com.plumsnow.service.VoucherService;
 import com.plumsnow.utils.RedisConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,10 +25,10 @@ import java.util.List;
  * @since 2024
  */
 @Service
-public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> implements IVoucherService {
+public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> implements VoucherService {
 
     @Resource
-    private ISeckillVoucherService seckillVoucherService;
+    private SeckillVoucherService seckillVoucherService;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;

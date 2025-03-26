@@ -9,7 +9,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 @Component
-public class RedisIdWorker {
+public class GlobalIdUtils {
 
     private static final long BEGIN_TIMESTAMP = 1640995200L;
     private static final long COUNT_BIT = 32;

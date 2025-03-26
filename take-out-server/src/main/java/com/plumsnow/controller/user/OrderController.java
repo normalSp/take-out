@@ -1,6 +1,5 @@
 package com.plumsnow.controller.user;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -34,9 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController("userOrderController")
@@ -62,7 +59,7 @@ public class OrderController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
-    private IVoucherOrderService voucherOrderService;
+    private VoucherOrderService voucherOrderService;
 
     @PostMapping("/submit")
     @ApiOperation("订单提交")

@@ -3,7 +3,7 @@ package com.plumsnow.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumsnow.entity.Blog;
 import com.plumsnow.mapper.BlogMapper;
-import com.plumsnow.service.IBlogService;
+import com.plumsnow.service.BlogService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024
  */
 @Service
-public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IBlogService {
+public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService {
 
 }

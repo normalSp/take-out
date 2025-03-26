@@ -11,6 +11,6 @@ import com.plumsnow.entity.SeckillVoucher;
  * @author plumsnow
  * @since 2024
  */
-public interface ISeckillVoucherService extends IService<SeckillVoucher> {
+public interface SeckillVoucherService extends IService<SeckillVoucher> {
 
 }

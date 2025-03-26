@@ -7,10 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.plumsnow.context.BaseContext;
 import com.plumsnow.entity.Voucher;
 import com.plumsnow.entity.VoucherOrder;
-import com.plumsnow.service.ISeckillVoucherService;
-import com.plumsnow.service.IVoucherOrderService;
-import com.plumsnow.service.IVoucherService;
-import com.plumsnow.utils.RedisIdWorker;
+import com.plumsnow.service.VoucherOrderService;
+import com.plumsnow.service.VoucherService;
+import com.plumsnow.utils.GlobalIdUtils;
 import com.plumsnow.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,16 +51,16 @@ import java.util.concurrent.Executors;
 public class VoucherOrderController {
 
     @Autowired
-    private IVoucherService iVoucherService;
+    private VoucherService voucherService;
 
     @Autowired
-    private ISeckillVoucherService SeckillVoucherService;
+    private com.plumsnow.service.SeckillVoucherService SeckillVoucherService;
 
     @Autowired
-    private RedisIdWorker redisIdWorker;
+    private GlobalIdUtils globalIdUtils;
 
     @Autowired
-    private IVoucherOrderService voucherOrderService;
+    private VoucherOrderService voucherOrderService;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -165,7 +164,7 @@ public class VoucherOrderController {
     @ApiOperation("秒杀抢卷")
     public Result seckillVoucher(@PathVariable("id") Long voucherId) {
         //判断是不是秒杀卷
-        Voucher voucher = iVoucherService.getById(voucherId);
+        Voucher voucher = voucherService.getById(voucherId);
         if(voucher.getType() != 1){
             Long userId = BaseContext.getCurrentId();
             //一人一单
@@ -179,7 +178,7 @@ public class VoucherOrderController {
             }
 
             VoucherOrder voucherOrder = new VoucherOrder();
-            long orderId = redisIdWorker.getId("voucher_order");
+            long orderId = globalIdUtils.getId("voucher_order");
             voucherOrder.setId(orderId);
             voucherOrder.setVoucherId(voucherId);
             voucherOrder.setUserId(userId);
@@ -193,7 +192,7 @@ public class VoucherOrderController {
         proxy = (VoucherOrderController) AopContext.currentProxy();
 
         //1. 执行lua脚本
-        long orderId = redisIdWorker.getId("order");
+        long orderId = globalIdUtils.getId("order");
 
         Long userId = BaseContext.getCurrentId();
         Long result = stringRedisTemplate.execute(
@@ -243,7 +242,7 @@ public class VoucherOrderController {
             }
 
             VoucherOrder voucherOrder = new VoucherOrder();
-            long orderId = redisIdWorker.getId("voucher_order");
+            long orderId = globalIdUtils.getId("voucher_order");
             voucherOrder.setId(orderId);
             voucherOrder.setVoucherId(voucherId);
             voucherOrder.setUserId(userId);

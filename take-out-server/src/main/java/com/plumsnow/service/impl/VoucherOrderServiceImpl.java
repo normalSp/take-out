@@ -3,7 +3,7 @@ package com.plumsnow.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumsnow.entity.VoucherOrder;
 import com.plumsnow.mapper.VoucherOrderMapper;
-import com.plumsnow.service.IVoucherOrderService;
+import com.plumsnow.service.VoucherOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, VoucherOrder> implements IVoucherOrderService {
+public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, VoucherOrder> implements VoucherOrderService {
 
 
 

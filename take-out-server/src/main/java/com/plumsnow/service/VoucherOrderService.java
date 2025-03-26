@@ -1,7 +1,7 @@
 package com.plumsnow.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.plumsnow.entity.Follow;
+import com.plumsnow.entity.VoucherOrder;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.plumsnow.entity.Follow;
  * @author plumsnow
  * @since 2024
  */
-public interface IFollowService extends IService<Follow> {
+public interface VoucherOrderService extends IService<VoucherOrder> {
 
 }

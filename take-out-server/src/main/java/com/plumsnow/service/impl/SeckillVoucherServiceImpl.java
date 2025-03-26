@@ -3,7 +3,7 @@ package com.plumsnow.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumsnow.entity.SeckillVoucher;
 import com.plumsnow.mapper.SeckillVoucherMapper;
-import com.plumsnow.service.ISeckillVoucherService;
+import com.plumsnow.service.SeckillVoucherService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2024
  */
 @Service
-public class SeckillVoucherServiceImpl extends ServiceImpl<SeckillVoucherMapper, SeckillVoucher> implements ISeckillVoucherService {
+public class SeckillVoucherServiceImpl extends ServiceImpl<SeckillVoucherMapper, SeckillVoucher> implements SeckillVoucherService {
 
 }

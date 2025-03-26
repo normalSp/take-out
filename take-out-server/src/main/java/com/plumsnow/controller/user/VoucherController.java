@@ -1,7 +1,6 @@
 package com.plumsnow.controller.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.plumsnow.constant.MessageConstant;
 import com.plumsnow.context.BaseContext;
@@ -12,9 +11,9 @@ import com.plumsnow.entity.VoucherOrder;
 import com.plumsnow.result.PageResult;
 import com.plumsnow.result.Result;
 import com.plumsnow.entity.Voucher;
-import com.plumsnow.service.ISeckillVoucherService;
-import com.plumsnow.service.IVoucherOrderService;
-import com.plumsnow.service.IVoucherService;
+import com.plumsnow.service.SeckillVoucherService;
+import com.plumsnow.service.VoucherOrderService;
+import com.plumsnow.service.VoucherService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -44,16 +43,16 @@ import java.util.Objects;
 public class VoucherController {
 
     @Autowired
-    private ISeckillVoucherService seckillVoucherService;
+    private SeckillVoucherService seckillVoucherService;
 
     @Resource
-    private IVoucherService voucherService;
+    private VoucherService voucherService;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private IVoucherOrderService voucherOrderService;
+    private VoucherOrderService voucherOrderService;
 
     /**
      * 查询店铺的优惠券列表
