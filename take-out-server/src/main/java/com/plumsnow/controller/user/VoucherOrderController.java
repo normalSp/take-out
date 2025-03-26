@@ -34,8 +34,6 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -71,11 +69,9 @@ public class VoucherOrderController {
     @Autowired
     private RedissonClient redissonClient;
 
-    // 用于存放下单信息的阻塞队列，如果队列中没有对象就会被阻塞，直到有对象可以取出
-    private final BlockingQueue<VoucherOrder> orderTasks = new ArrayBlockingQueue<>(1024*1024);
     //线程池
     private static final ExecutorService SECKILL_ORDER_EXECUTOR = Executors.newSingleThreadExecutor();
-    
+
 
     //在类初始化完成后就执行下面的方法
     @PostConstruct
@@ -114,12 +110,12 @@ public class VoucherOrderController {
                 } catch (Exception e) {
                     log.info("处理订单异常：{}", e.getMessage());
 
-                    handlePendingList();
+                    pendingList();
                 }
 
             }
         }
-        private void handlePendingList() {
+        private void pendingList() {
             while (true){
                 try {
                     //1. 获取pending-list中的订单信息 XREADGROUP GROUP g1 c1 COUNT 1 STREAMS stream.orders 0
@@ -234,7 +230,7 @@ public class VoucherOrderController {
             }
 
 
-            // 扣库存
+            // 扣库存 乐观锁解决超买超卖
             boolean b = SeckillVoucherService.update()
                     .setSql("stock = stock - 1")
                     .eq("voucher_id", voucherId)

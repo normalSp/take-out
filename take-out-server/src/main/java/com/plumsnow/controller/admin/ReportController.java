@@ -98,54 +98,6 @@ public class ReportController {
         return Result.success(new TurnoverReportVO(join, turnoverJoin));
     }
 
-
-    @GetMapping("/userStatistics")
-    @ApiOperation("用户统计")
-    public Result<UserReportVO> userStatistics(
-            @DateTimeFormat(pattern = "yyyy-MM-dd")  LocalDate begin,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
-
-        List<LocalDate> dataList = new ArrayList<>();
-
-        LocalDate l = begin;
-        while(!l.isEqual(end)){
-            l = l.plusDays(1);
-            dataList.add(l);
-        }
-
-        String dateJoin = StringUtils.join(dataList, ",");
-
-        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.between(User::getCreateTime, begin, end);
-        List<User> userList = userService.list(lambdaQueryWrapper);
-
-        List<Integer> userTotalCountList = new ArrayList<>();
-        List<Integer> userNewCountList = new ArrayList<>();
-
-        for(LocalDate date : dataList){
-            Integer userTotalCount = 0;
-            Integer userNewCount = 0;
-
-            for(User user : userList){
-                if(user.getCreateTime().isAfter(LocalDateTime.of(date, LocalTime.MIN)) && user.getCreateTime().isBefore(LocalDateTime.of(date, LocalTime.MAX))){
-                    userNewCount++;
-                }
-                if(user.getCreateTime().isBefore(LocalDateTime.of(date, LocalTime.MAX))){
-                    userTotalCount++;
-                }
-            }
-
-            userTotalCountList.add(userTotalCount);
-            userNewCountList.add(userNewCount);
-        }
-
-        String userTotalCountString = StringUtils.join(userTotalCountList, ",");
-        String userNewCountString = StringUtils.join(userNewCountList, ",");
-
-        return Result.success(new UserReportVO(dateJoin, userTotalCountString, userNewCountString));
-    }
-
-
     @GetMapping("/ordersStatistics")
     @ApiOperation("订单统计")
     public Result<OrderReportVO> ordersStatistics(

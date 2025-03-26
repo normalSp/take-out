@@ -322,33 +322,6 @@ public class OrderController {
         return Result.success(orderVO);
     }
 
-    /**
-     * 客户催单
-     * @param id
-     * @return
-     */
-    @GetMapping("/reminder/{id}")
-    @ApiOperation("客户催单")
-    public Result reminder(@PathVariable("id") Long id){
-        LambdaQueryWrapper<Orders> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(Orders::getId,id);
-        Orders orders = ordersService.getOne(lambdaQueryWrapper);
-
-        if(null == orders){
-            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
-        }
-
-        Map map = new HashMap<>();
-        map.put("type", 2);
-        map.put("orderId", id);
-        map.put("cintent", "订单号：" + orders.getId());
-
-        String json = JSON.toJSONString(map);
-        webSocketServer.sendToAllClient(json);
-
-        return Result.success();
-    }
-
     @Transactional
     @PutMapping("/cancel/{id}")
     @ApiOperation("取消订单")

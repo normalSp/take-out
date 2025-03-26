@@ -132,7 +132,12 @@ public class VoucherController {
         List<VoucherOrder> voucherOrderListToRemove = new ArrayList<>();
 
         for(VoucherOrder voucherOrder : voucherOrderList){
+            log.info("voucherOrder.getVoucherId():{}", voucherOrder.getVoucherId());
             Voucher voucher = voucherService.getById(voucherOrder.getVoucherId());
+            if(null == voucher){
+                log.info("空:{}", voucherOrder.getVoucherId());
+                continue;
+            }
             if(!Objects.equals(voucher.getShopId(), shopId)){
                 //voucherOrderList.remove(voucherOrder);
                 voucherOrderListToRemove.add(voucherOrder);
