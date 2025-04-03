@@ -3,7 +3,6 @@ package com.plumsnow.controller.user;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.plumsnow.WebSocket.WebSocketServer;
 import com.plumsnow.constant.MessageConstant;
 import com.plumsnow.constant.RedisKeyConstant;
 import com.plumsnow.context.BaseContext;
@@ -17,7 +16,6 @@ import com.plumsnow.result.PageResult;
 import com.plumsnow.result.Result;
 import com.plumsnow.service.*;
 import com.plumsnow.service.impl.OrderDetailService;
-import com.plumsnow.utils.WeChatPayUtil;
 import com.plumsnow.vo.OrderPaymentVO;
 import com.plumsnow.vo.OrderSubmitVO;
 import com.plumsnow.vo.OrderVO;
@@ -52,10 +50,6 @@ public class OrderController {
     private ShoppingCartService shoppingCartService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private WebSocketServer webSocketServer;
-    @Autowired
-    private WeChatPayUtil weChatPayUtil;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
@@ -230,20 +224,6 @@ public class OrderController {
         return Result.success(orderSubmitVO);
     }
 
-    /**
-     * 订单支付
-     *
-     * @param ordersPaymentDTO
-     * @return
-     */
-    @PutMapping("/payment")
-    @ApiOperation("订单支付")
-    public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
-        log.info("订单支付：{}", ordersPaymentDTO);
-        OrderPaymentVO orderPaymentVO = ordersService.payment(ordersPaymentDTO);
-        log.info("生成预支付交易单：{}", orderPaymentVO);
-        return Result.success(orderPaymentVO);
-    }
 
     /**
      * 历史订单查询
@@ -340,13 +320,7 @@ public class OrderController {
         //支付状态
         Integer payStatus = orders.getPayStatus();
         if (payStatus == Orders.TO_BE_CONFIRMED) {
-            //用户已支付，需要退款
-            String refund = weChatPayUtil.refund(
-                    orders.getNumber(),
-                    orders.getNumber(),
-                    new BigDecimal("0.01"),
-                    new BigDecimal("0.01"));
-            log.info("申请退款：{}", refund);
+            log.info("申请退款：{}", payStatus);
             //支付状态修改为 退款
             orders.setPayStatus(Orders.REFUND);
         }

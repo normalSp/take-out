@@ -161,6 +161,12 @@
             <version>3.13.6</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.hmdp</groupId>
+            <artifactId>comment</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

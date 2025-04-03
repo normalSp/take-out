@@ -4,11 +4,15 @@ package com.plumsnow.controller.user;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
+
+import com.comment.utils.RedisConstants;
+import com.plumsnow.constant.MessageConstant;
 import com.plumsnow.context.BaseContext;
 import com.plumsnow.entity.Voucher;
 import com.plumsnow.entity.VoucherOrder;
 import com.plumsnow.service.VoucherOrderService;
 import com.plumsnow.service.VoucherService;
+import com.plumsnow.utils.CacheClient;
 import com.plumsnow.utils.GlobalIdUtils;
 import com.plumsnow.result.Result;
 import io.swagger.annotations.Api;
@@ -35,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -67,6 +72,12 @@ public class VoucherOrderController {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    //注入CacheClient
+    private CacheClient cacheClient;
+    public VoucherOrderController(CacheClient cacheClient) {
+        this.cacheClient = cacheClient;
+    }
 
     //线程池
     private static final ExecutorService SECKILL_ORDER_EXECUTOR = Executors.newSingleThreadExecutor();
@@ -164,7 +175,17 @@ public class VoucherOrderController {
     @ApiOperation("秒杀抢卷")
     public Result seckillVoucher(@PathVariable("id") Long voucherId) {
         //判断是不是秒杀卷
-        Voucher voucher = voucherService.getById(voucherId);
+        //使用设置空值解决缓存击透
+        Voucher voucher = cacheClient.queryWithPassThrough(RedisConstants.SECKILL_TYPE, voucherId, Voucher.class, voucherService::getById, RedisConstants.CACHE_NULL_TTL, TimeUnit.MINUTES);
+
+        //使用设置逻辑时间解决缓存击穿
+        //Voucher voucher = cacheClient.queryObjectWithLogical(RedisConstants.SECKILL_TYPE, voucherId, Voucher.class, voucherService::getById, RedisConstants.SECKILL_LOCK, RedisConstants.CACHE_NULL_TTL, TimeUnit.MINUTES);
+
+        //没找到
+        if(voucher == null){
+            return Result.error(MessageConstant.SECKILLVOUCHER_NOT_EXIST);
+        }
+
         if(voucher.getType() != 1){
             Long userId = BaseContext.getCurrentId();
             //一人一单

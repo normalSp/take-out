@@ -55,27 +55,6 @@ public class UserController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @PostMapping("/login")
-    @ApiOperation("用户微信登录")
-    public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
-        log.info("用户授权码: {}", userLoginDTO.getCode());
-
-        //微信登录
-        User user = userService.login(userLoginDTO);
-
-        //生成jwt令牌
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(JwtClaimsConstant.USER_ID,user.getId());
-        String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
-
-        UserLoginVO userLoginVO = UserLoginVO.builder()
-                .id(user.getId())
-                .openid(user.getOpenid())
-                .token(token)
-                .build();
-
-        return Result.success(userLoginVO);
-    }
 
     @PostMapping("/selectShop")
     @ApiOperation("选择商店")

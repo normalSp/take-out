@@ -38,4 +38,6 @@ public class MessageConstant {
     public static final String UNKNOWN_SHOPID = "未知的商店id";
     public static final String MISSING_ATTRIBUTE = "缺少必要的参数";
     public static final String DEFAULT_ADDRESS_NOT_FOUND = "请先选择默认地址";
+    public static final String SECKILLVOUCHER_NOT_EXIST = "秒杀券不存在";
+    public static final String STOCK_NOT_SAME = "库存未更新完毕，请稍后再试";
 }

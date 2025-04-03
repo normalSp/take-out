@@ -13,7 +13,6 @@ import com.plumsnow.result.PageResult;
 import com.plumsnow.result.Result;
 import com.plumsnow.service.OrdersDetailService;
 import com.plumsnow.service.OrdersService;
-import com.plumsnow.utils.WeChatPayUtil;
 import com.plumsnow.vo.OrderStatisticsVO;
 import com.plumsnow.vo.OrderVO;
 import io.swagger.annotations.Api;
@@ -40,8 +39,6 @@ public class OrderController {
     private OrdersService ordersService;
     @Autowired
     private OrdersDetailService ordersDetailService;
-    @Autowired
-    private WeChatPayUtil weChatPayUtil;
 
     @GetMapping("/conditionSearch")
     @Transactional
@@ -153,18 +150,6 @@ public class OrderController {
         LambdaQueryWrapper<Orders> lamdaQueryWrapper = new LambdaQueryWrapper<>();
         lamdaQueryWrapper.eq(Orders::getId, ordersCancelDTO.getId());
         Orders orders = ordersService.getOne(lamdaQueryWrapper);
-
-        //支付状态
-        Integer payStatus = orders.getPayStatus();
-        if (payStatus == 1) {
-            //用户已支付，需要退款
-            String refund = weChatPayUtil.refund(
-                    orders.getNumber(),
-                    orders.getNumber(),
-                    new BigDecimal("0.01"),
-                    new BigDecimal("0.01"));
-            log.info("申请退款：{}", refund);
-        }
 
         //管理端取消订单需要退款，根据订单id更新订单状态、取消原因、取消时间
         Orders orders1 = new Orders();

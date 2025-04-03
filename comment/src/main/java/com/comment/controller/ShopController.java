@@ -56,78 +56,13 @@ public class ShopController {
     public Result queryShopById(@PathVariable("id") Long id) {
 
         //Shop shop = cacheClient.queryObjectWithLogical("shop:", id, Shop.class,shopService::getById, "lock:shop", 30L, TimeUnit.MINUTES);
-
         Shop shop = cacheClient.queryWithPassThrough("shop:", id, Shop.class, shopService::getById, RedisConstants.CACHE_SHOP_TTL, TimeUnit.MINUTES);
-
-        //Shop shop = queryShopMutex(id);
-
-        //Shop shop = queryShopWithLogical(id);
 
         if (shop == null) {
             return Result.fail("商铺不存在");
         }
 
         return Result.ok(shop);
-    }
-
-    public Shop queryShopWithLogical(Long id) {
-        String shopJson = stringRedisTemplate.opsForValue().get("shop:" + id);
-
-        if (StrUtil.isBlank(shopJson)) {
-            return null;
-        }
-
-
-        //1. 命中，反序列化为对象
-        RedisData redisData = JSONUtil.toBean(shopJson, RedisData.class);
-        Object data = redisData.getData();
-        Shop shop = JSONUtil.toBean((JSONObject) data, Shop.class);
-
-        LocalDateTime expireTime = redisData.getExpireTime();
-
-        //2. 判断是否过期
-        if(expireTime.isAfter(LocalDateTime.now())) {
-            //2.1 未过期，返回
-            return shop;
-        }
-        //2.2 过期，需要缓存重建
-
-        //3. 缓存重建
-        //3.1 获取互斥锁
-        LockUtils lockUtils =  new LockUtils(stringRedisTemplate);
-        boolean flag = lockUtils.tryLock(RedisConstants.LOCK_SHOP_KEY + id);
-
-        //3.2 判断获取是否成功
-        if(flag) {
-            //x. DoubleCheck 如果过期直接返回
-            String shopJson1 = stringRedisTemplate.opsForValue().get("shop:" + id);
-            RedisData redisData1 = JSONUtil.toBean(shopJson, RedisData.class);
-            Object data1 = redisData.getData();
-            Shop shop1 = JSONUtil.toBean((JSONObject) data, Shop.class);
-
-            LocalDateTime expireTime1 = redisData.getExpireTime();
-
-            //x.1 判断是否过期
-            if(expireTime1.isAfter(LocalDateTime.now())) {
-                //x.2 未过期，返回
-                return shop1;
-            }
-
-            //3.3 成功，开启独立线程，进行缓存重建
-            LockUtils.CACHE_REBUILD_EXECUTOR.submit(() -> {
-                try {
-                    //重建缓存
-                    this.saveShopToReids(id, RedisConstants.CACHE_SHOP_TTL);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    //释放锁
-                    lockUtils.unLock(RedisConstants.LOCK_SHOP_KEY + id);
-                }
-            });
-        }
-        //3.4 失败，返回过期的商铺信息
-        return shop;
     }
 
     public Shop queryShopMutex(Long id) {
