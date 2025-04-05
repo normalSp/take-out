@@ -2,6 +2,7 @@ package com.plumsnow.controller.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.comment.utils.RedisConstants;
 import com.plumsnow.constant.MessageConstant;
 import com.plumsnow.context.BaseContext;
 import com.plumsnow.dto.VoucherOrderDTO;
@@ -23,9 +24,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -122,7 +123,7 @@ public class VoucherController {
     @GetMapping("/order/list/{shopId}")
     @ApiOperation("根据userId查询用户下单的优惠券")
     public Result<List<VoucherOrderDTO>> queryMyVoucher(@PathVariable Long shopId) {
-        LambdaQueryWrapper<VoucherOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+/*        LambdaQueryWrapper<VoucherOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(VoucherOrder::getUserId, BaseContext.getCurrentId());
         lambdaQueryWrapper.eq(VoucherOrder::getStatus, 1);
         lambdaQueryWrapper.orderByDesc(VoucherOrder::getUpdateTime);
@@ -159,8 +160,88 @@ public class VoucherController {
             voucherOrderDTO.setRules(voucher.getRules());
             voucherOrderDTO.setVoucherId(voucherOrder.getVoucherId());
             voucherOrderDTOList.add(voucherOrderDTO);
+        }*/
+
+/*      List<VoucherOrderDTO> voucherOrderDTOList = new ArrayList<>();*/
+/*        //根据shopId查找所属的全部voucherId
+        List<String> voucherIdList = stringRedisTemplate.opsForList().range(RedisConstants.SHOP_SECKILL_INDEX + shopId, 0, -1);
+
+        //填充
+        LambdaQueryWrapper<VoucherOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(VoucherOrder::getVoucherId, voucherIdList);
+        lambdaQueryWrapper.eq(VoucherOrder::getUserId, BaseContext.getCurrentId());
+        List<VoucherOrder> voucherOrderList = voucherOrderService.list(lambdaQueryWrapper);
+        for(VoucherOrder voucherOrder : voucherOrderList){
+            Voucher voucher = voucherService.getById(voucherOrder.getVoucherId());
+            VoucherOrderDTO voucherOrderDTO = new VoucherOrderDTO();
+            voucherOrderDTO.setShopId(voucher.getShopId());
+            voucherOrderDTO.setPayValue(voucher.getPayValue());
+            voucherOrderDTO.setActualValue(voucher.getActualValue());
+            voucherOrderDTO.setType(voucher.getType());
+            voucherOrderDTO.setPayStatus(voucherOrder.getStatus());
+            voucherOrderDTO.setTitle(voucher.getTitle());
+            voucherOrderDTO.setSubTitle(voucher.getSubTitle());
+            voucherOrderDTO.setRules(voucher.getRules());
+            voucherOrderDTO.setVoucherId(voucherOrder.getVoucherId());
+            voucherOrderDTOList.add(voucherOrderDTO);
+        }*/
+        List<VoucherOrderDTO> voucherOrderDTOList = getVoucherOrders(shopId);
+        return Result.success(voucherOrderDTOList);
+    }
+
+    //填充代码
+    private VoucherOrderDTO convertToDTO(VoucherOrder order, Voucher voucher) {
+        return VoucherOrderDTO.builder()
+                .shopId(voucher.getShopId())
+                .payValue(voucher.getPayValue())
+                .actualValue(voucher.getActualValue())
+                .type(voucher.getType())
+                .payStatus(order.getStatus())
+                .title(voucher.getTitle())
+                .subTitle(voucher.getSubTitle())
+                .rules(voucher.getRules())
+                .voucherId(order.getVoucherId())
+                .build();
+    }
+
+    public List<VoucherOrderDTO> getVoucherOrders(Long shopId) {
+        // 1. 获取并转换优惠券ID列表（空值保护）
+        List<Long> voucherIds = Optional.ofNullable(
+                        stringRedisTemplate.opsForList().range(RedisConstants.SHOP_SECKILL_INDEX + shopId, 0, -1))
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
+
+        if (voucherIds.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        return Result.success(voucherOrderDTOList);
+        // 2. 批量查询订单和优惠券信息（解决N+1问题）
+        List<VoucherOrder> orders = voucherOrderService.lambdaQuery()
+                .in(VoucherOrder::getVoucherId, voucherIds)
+                .eq(VoucherOrder::getUserId, BaseContext.getCurrentId())
+                .list();
+
+        if (orders.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 3. 批量获取优惠券数据
+        Map<Long, Voucher> voucherMap = voucherService.listByIds(
+                        orders.stream()
+                                .map(VoucherOrder::getVoucherId)
+                                .collect(Collectors.toList()))
+                .stream()
+                .collect(Collectors.toMap(Voucher::getId, Function.identity()));
+
+        // 4. 使用Stream转换DTO
+        return orders.stream()
+                .map(order -> {
+                    Voucher voucher = voucherMap.get(order.getVoucherId());
+                    return voucher != null ? convertToDTO(order, voucher) : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }

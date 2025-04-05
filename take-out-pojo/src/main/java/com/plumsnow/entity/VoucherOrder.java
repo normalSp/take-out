@@ -1,6 +1,7 @@
 package com.plumsnow.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -41,6 +42,12 @@ public class VoucherOrder implements Serializable {
      * 购买的代金券id
      */
     private Long voucherId;
+
+    /**
+     * 商家id
+     */
+    @TableField(exist = false)
+    private Long shopId;
 
     /**
      * 支付方式 1：余额支付；2：支付宝；3：微信

@@ -114,6 +114,19 @@ public class VoucherOrderController {
                     VoucherOrder voucherOrder = BeanUtil.fillBeanWithMap(value, new VoucherOrder(), true);
                     handleVoucherOrder(voucherOrder);
 
+                    //x.给redis加入shopId-voucherId索引
+/*                    stringRedisTemplate.opsForValue().set(RedisConstants.SHOP_SECKILL_INDEX + voucherOrder
+                            .getShopId(), String.valueOf(voucherOrder.getVoucherId()));*/
+/*                    stringRedisTemplate.opsForHash().put(
+                            RedisConstants.SHOP_SECKILL_INDEX,
+                            String.valueOf(voucherOrder.getShopId()),
+                            String.valueOf(voucherOrder.getVoucherId())
+                    );*/
+                    stringRedisTemplate.opsForList().leftPush(
+                            RedisConstants.SHOP_SECKILL_INDEX + voucherOrder.getShopId(),
+                            String.valueOf(voucherOrder.getVoucherId())
+                    );
+
                     //4. ACK 确认 XACK stream.orders g1 id
                     stringRedisTemplate.opsForStream().acknowledge(queueName, "g1", entries.getId());
 
@@ -165,15 +178,16 @@ public class VoucherOrderController {
     private static final DefaultRedisScript<Long> SECKILL_LUA_SCRIPT;
     static {
         SECKILL_LUA_SCRIPT = new DefaultRedisScript<>();
-        SECKILL_LUA_SCRIPT.setLocation(new ClassPathResource("seckill.lua"));
+        //SECKILL_LUA_SCRIPT.setLocation(new ClassPathResource("seckill.lua"));
+        SECKILL_LUA_SCRIPT.setLocation(new ClassPathResource("seckill_new.lua"));
         //SECKILL_LUA_SCRIPT.setLocation(new ClassPathResource("seckill_test.lua"));
         SECKILL_LUA_SCRIPT.setResultType(Long.class);
     }
 
     private VoucherOrderController proxy;
-    @PostMapping("seckill/{id}")
+    @PostMapping("seckill/{voucherId}/{shopId}")
     @ApiOperation("秒杀抢卷")
-    public Result seckillVoucher(@PathVariable("id") Long voucherId) {
+    public Result seckillVoucher(@PathVariable("voucherId") Long voucherId, @PathVariable("shopId") Long shopId) {
         //判断是不是秒杀卷
         //使用设置空值解决缓存击透
         Voucher voucher = cacheClient.queryWithPassThrough(RedisConstants.SECKILL_TYPE, voucherId, Voucher.class, voucherService::getById, RedisConstants.CACHE_NULL_TTL, TimeUnit.MINUTES);
@@ -219,7 +233,7 @@ public class VoucherOrderController {
         Long result = stringRedisTemplate.execute(
                 SECKILL_LUA_SCRIPT,
                 Collections.emptyList(),
-                voucherId.toString(), userId.toString(), String.valueOf(orderId)
+                voucherId.toString(), userId.toString(), String.valueOf(orderId), shopId.toString()
         );
 
         //2. 判断lua脚本结果

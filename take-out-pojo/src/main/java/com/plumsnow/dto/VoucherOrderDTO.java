@@ -1,10 +1,12 @@
 package com.plumsnow.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
+@Builder
 public class VoucherOrderDTO implements Serializable {
     /**
      * 优惠卷id
