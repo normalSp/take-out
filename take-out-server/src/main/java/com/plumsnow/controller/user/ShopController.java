@@ -69,7 +69,7 @@ public class ShopController {
 
     @GetMapping("/of/type")
     @ApiOperation("分页查询商铺信息")
-    public Result queryShopByType(
+    public Result queryShopByXY(
             @RequestParam(value = "typeId", defaultValue = "1") Integer typeId,
             @RequestParam(value = "current", defaultValue = "1") Integer current,
             @RequestParam(value = "size") Integer size,

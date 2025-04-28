@@ -126,7 +126,7 @@ public class OrderController {
     }
 
     @PostMapping("/submitByShopId/{voucherId}")
-    @ApiOperation("订单提交-附加shopId")
+    @ApiOperation("订单提交-voucherId")
     @Transactional
     public Result<OrderSubmitVO> submitByShopId(@RequestBody OrdersSubmitDTO ordersSubmitDTO, @PathVariable(required = false) String voucherId){
         log.info("订单提交信息:{}",ordersSubmitDTO);

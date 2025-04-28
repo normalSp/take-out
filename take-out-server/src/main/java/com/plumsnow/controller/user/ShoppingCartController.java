@@ -119,7 +119,6 @@ public class ShoppingCartController {
     }
 
     /**
-     * 购物车商品减1
      * @param shoppingCart
      * @return
      */
