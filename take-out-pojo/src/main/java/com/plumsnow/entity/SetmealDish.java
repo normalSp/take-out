@@ -1,5 +1,6 @@
 package com.plumsnow.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,5 +35,6 @@ public class SetmealDish implements Serializable {
     private BigDecimal price;
 
     //份数
+    @TableField(exist = false)
     private Integer copies;
 }

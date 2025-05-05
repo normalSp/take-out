@@ -1,5 +1,6 @@
 package com.plumsnow.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -55,7 +56,7 @@ public class Orders implements Serializable {
     private LocalDateTime orderTime;
 
     //结账时间
-    private LocalDateTime checkoutTime;
+    //private LocalDateTime checkoutTime;
 
     //支付方式 1微信，2支付宝
     private Integer payMethod;
@@ -70,6 +71,7 @@ public class Orders implements Serializable {
     private String remark;
 
     //用户名
+    @TableField(exist = false)
     private String userName;
 
     //手机号
@@ -85,7 +87,7 @@ public class Orders implements Serializable {
     private String cancelReason;
 
     //订单拒绝原因
-    private String rejectionReason;
+    //private String rejectionReason;
 
     //订单取消时间
     private LocalDateTime cancelTime;
@@ -97,7 +99,7 @@ public class Orders implements Serializable {
     private Integer deliveryStatus;
 
     //送达时间
-    private LocalDateTime deliveryTime;
+    //private LocalDateTime deliveryTime;
 
     //打包费
     private int packAmount;
